@@ -144,7 +144,7 @@ exports.getScraping = (req, res) => {
 exports.getGithub = (req, res, next) => {
   const token = req.user.tokens.find(token => token.kind === 'github');
   const github = new Github({ token: token.accessToken });
-  const repo = github.getRepo('sahat', 'satellizer');
+  const repo = github.getRepo('josebrwn', 'hackathon-starter');
   repo.getDetails((err, repo) => {
     if (err) { return next(err); }
     res.render('api/github', {
@@ -399,7 +399,7 @@ exports.postTwilio = (req, res, next) => {
 
   const message = {
     to: req.body.number,
-    from: '+13472235148',
+    from: '+16233350027',
     body: req.body.message
   };
   twilio.sendMessage(message, (err, responseData) => {
@@ -426,8 +426,8 @@ exports.getClockwork = (req, res) => {
 exports.postClockwork = (req, res, next) => {
   const message = {
     To: req.body.telephone,
-    From: 'Hackathon',
-    Content: 'Hello from the Hackathon Starter'
+    From: 'SendLoveIO', // defaults to 43704 in the USA. We could include a field for this?
+    Content: req.body.message
   };
   clockwork.sendSms(message, (err, responseData) => {
     if (err) { return next(err.errDesc); }

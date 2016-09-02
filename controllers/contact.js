@@ -4,6 +4,7 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.SENDGRID_USER,
     pass: process.env.SENDGRID_PASSWORD
+	// token: process.env.SENDGRID_TOKEN
   }
 });
 
@@ -24,7 +25,7 @@ exports.getContact = (req, res) => {
 exports.postContact = (req, res) => {
   req.assert('name', 'Name cannot be blank').notEmpty();
   req.assert('email', 'Email is not valid').isEmail();
-  req.assert('message', 'Message cannot be blank').notEmpty();
+  // req.assert('message', 'Message cannot be blank').notEmpty();
 
   const errors = req.validationErrors();
 
@@ -34,10 +35,10 @@ exports.postContact = (req, res) => {
   }
 
   const mailOptions = {
-    to: 'your@email.com',
-    from: `${req.body.name} <${req.body.email}>`,
-    subject: 'Contact Form | Hackathon Starter',
-    text: req.body.message
+    to: 'joe@sendlove.io',
+    from: 'sendlove.io@sendgrid.net',
+    subject: 'Contact Form | SendLove I/O',
+    text: `\n ${req.body.name}  \n ${req.body.email}  \n  ${req.body.message}`
   };
 
   transporter.sendMail(mailOptions, (err) => {
@@ -45,7 +46,7 @@ exports.postContact = (req, res) => {
       req.flash('errors', { msg: err.message });
       return res.redirect('/contact');
     }
-    req.flash('success', { msg: 'Email has been sent successfully!' });
+    req.flash('success', { msg: 'Thanks for being part of SendLove I/O! We will get back to you soon :)' });
     res.redirect('/contact');
   });
 };

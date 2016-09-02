@@ -21,6 +21,7 @@ block content
         input(type='hidden', name='_csrf', value=_csrf)
         .form-group
           .input-group
-            input.form-control(type='text', name='telephone', placeholder='Phone Number (international format)')
+            input.form-control(type='text', name='telephone', placeholder='Mobile number (international format):')
+            input.form-control(type='text', name='message', placeholder='Message to send:')
             span.input-group-btn
               button.btn.btn-success(type='submit') Send
