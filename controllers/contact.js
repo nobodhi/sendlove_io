@@ -35,7 +35,7 @@ exports.postContact = (req, res) => {
   }
 
   const mailOptions = {
-    to: 'joe@sendlove.io;rebecca@sendlove.io',
+    to: 'rebecca@sendlove.io,
     from: 'sendlove.io@sendgrid.net',
     subject: 'Contact Form | SendLove I/O',
     text: `\n ${req.body.name}  \n ${req.body.email}  \n  ${req.body.message}`
