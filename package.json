@@ -1,9 +1,9 @@
 {
-  "name": "hackathon-starter",
-  "version": "4.2.0",
+  "name": "sendlove_io",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+    "url": "https://github.com/josebrwn/hackathon-starter.git"
   },
   "scripts": {
     "start": "node app.js",
