@@ -188,6 +188,7 @@ exports.getGoodNews = (req, res, next) => {
     //const links = { results.getReddit.links };
     //const links_hp = { results.getHP.links };
     res.render('api/goodnews', {
+      title: "Good News",
       links: results.getReddit,
       links_hp: results.getHP,
       links_gn: results.getGN

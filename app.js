@@ -108,7 +108,7 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
  * Primary app routes.
  */
  app.get('/privacy', function (req, res) {
-  res.render('privacy', { title: 'Privacy Policy', message: 'Hello instagram. Here is some boilerplate.'});
+  res.render('privacy', { title: 'Privacy Policy'});
 });
 
 app.get('/', homeController.index);
