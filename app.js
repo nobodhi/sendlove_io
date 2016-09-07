@@ -107,6 +107,10 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
+ app.get('/privacy', function (req, res) {
+  res.render('privacy', { title: 'Privacy Policy', message: 'Hello instagram. Here is some boilerplate.'});
+});
+
 app.get('/', homeController.index);
 app.post('/', homeController.postContact);
 
@@ -138,6 +142,7 @@ app.get('/api/steam', passportConfig.isAuthenticated, passportConfig.isAuthorize
 app.get('/api/stripe', apiController.getStripe);
 //app.post('/api/stripe', apiController.postStripe);
 app.get('/api/scraping', apiController.getScraping);
+app.get('/api/goodnews', apiController.getGoodNews);
 app.get('/api/twilio', apiController.getTwilio);
 //app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/clockwork', apiController.getClockwork);
@@ -167,7 +172,7 @@ app.get('/auth/instagram', passport.authenticate('instagram'));
 app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location'] }));
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email', 'user_location', 'user_friends'] }));
 app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');
 });

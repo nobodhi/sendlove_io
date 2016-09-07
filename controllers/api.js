@@ -107,6 +107,11 @@ exports.getFacebook = (req, res, next) => {
       graph.get(`${req.user.facebook}/friends`, (err, friends) => {
         done(err, friends.data);
       });
+    },
+    getMyTaggableFriends: (done) => {
+      graph.get(`${req.user.facebook}/taggable_friends`, (err, taggable_friends) => {
+        done(err, taggable_friends.data);
+      });
     }
   },
   (err, results) => {
@@ -114,7 +119,8 @@ exports.getFacebook = (req, res, next) => {
     res.render('api/facebook', {
       title: 'Facebook API',
       me: results.getMyProfile,
-      friends: results.getMyFriends
+      friends: results.getMyFriends,
+      taggable_friends: results.getMyTaggableFriends
     });
   });
 };
@@ -124,10 +130,10 @@ exports.getFacebook = (req, res, next) => {
  * Web scraping example using Cheerio library.
  */
 exports.getScraping = (req, res) => {
-  request.get('https://news.ycombinator.com/', (err, request, body) => {
+  request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
     const $ = cheerio.load(body);
     const links = [];
-    $('.title a[href^="http"], a[href^="https"]').each((index, element) => {
+    $('.card__headlines a[href^="http"]').each((index, element) => {
       links.push($(element));
     });
     res.render('api/scraping', {
@@ -136,6 +142,79 @@ exports.getScraping = (req, res) => {
     });
   });
 };
+
+/**
+ * GET /api/goodnews
+ * Web scraping example using Cheerio library.
+ */
+exports.getGoodNews = (req, res, next) => {
+  const links = [];
+  const links_hp = [];
+  const links_gn = [];
+  async.parallel({
+    getReddit: (done) => {
+      request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {
+        const $ = cheerio.load(body);
+        $('.title a[href^="http"]').each((index, element) => {
+          links.push($(element));
+          
+        });
+        done(err, links);
+      });
+    }, 
+    getHP: (done) => {
+      request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
+        const $ = cheerio.load(body);
+        $('.card__headlines a[href^="http"]').each((index, element) => {
+          links_hp.push($(element));
+          
+        });
+        done(err, links_hp);
+      });
+    }, 
+    getGN: (done) => {
+      request.get('http://www.goodnewsnetwork.org/', (err, request, body) => {
+        const $ = cheerio.load(body);
+        $('.entry-title a[href^="http"]').each((index, element) => {
+          links_gn.push($(element));
+          
+        });
+        done(err, links_gn);
+      });
+    }  
+  },
+  (err, results) => {
+    if (err)  { return next(err); }
+    //const links = { results.getReddit.links };
+    //const links_hp = { results.getHP.links };
+    res.render('api/goodnews', {
+      links: results.getReddit,
+      links_hp: results.getHP,
+      links_gn: results.getGN
+    });
+  });
+};
+/*
+  request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {
+    const $ = cheerio.load(body);
+    $('.title a[href^="http"]').each((index, element) => {
+      links.push($(element));
+    });
+  }),
+  request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
+    const $ = cheerio.load(body);
+      $('.card__headlines a[href^="http"]').each((index, element) => {
+          links_hp.push($(element));
+      });
+  }), 
+  res.render('api/goodnews', {
+    title: 'Good News',
+    links,
+    links_hp
+  });
+*/
+
+
 
 /**
  * GET /api/github
@@ -481,7 +560,7 @@ exports.getInstagram = (req, res, next) => {
         done(err, medias);
       });
     }
-  }, (err, results) => {
+  },(err, results) => {
     if (err) { return next(err); }
     res.render('api/instagram', {
       title: 'Instagram API',

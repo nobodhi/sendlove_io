@@ -19,7 +19,12 @@ block content
   h3
     i.fa.fa-user
     |  My Profile
-  img.thumbnail(src='https://graph.facebook.com/#{me.id}/picture?type=large', width='90', height='90')
+    <br>
+    if user.profile.picture
+        img(src=user.profile.picture)
+    else
+        img(src=user.gravatar(60))
+
   h4= me.name
   h6 First Name: #{me.first_name}
   h6 Last Name: #{me.last_name}
@@ -32,9 +37,15 @@ block content
 
   h3
     i.fa.fa-group
-    |  My Friends
+    |  'Taggable' Facebook Friends
+  .row
+    for taggable_friend in taggable_friends
+      .col-xs-3.col-md-2
+        p #{taggable_friend.name} 
+  h3
+    i.fa.fa-group
+    |  Facebook Friends on SendLove.io
   .row
     for friend in friends
       .col-xs-3.col-md-2
-        a.thumbnail(href='http://facebook.com/#{friend.id}')
-          img(src='https://graph.facebook.com/#{friend.id}/picture?width=150&height=150')
+        p #{friend.name} 

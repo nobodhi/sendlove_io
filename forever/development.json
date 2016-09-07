@@ -1,0 +1,9 @@
+// forever/development.json
+{
+    // Comments are supported
+    "uid": "app",
+    "append": true,
+    "watch": true,
+    "script": "app.js",
+    "sourceDir": "/temp/sendlove_io"
+}
