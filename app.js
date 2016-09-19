@@ -107,7 +107,11 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
- app.get('/privacy', function (req, res) {
+app.get('/reply', function (req, res) {
+  res.render('reply', { title: 'SendLove I/O SMS'});
+});
+
+app.get('/privacy', function (req, res) {
   res.render('privacy', { title: 'Privacy Policy'});
 });
 
@@ -144,7 +148,7 @@ app.get('/api/stripe', apiController.getStripe);
 app.get('/api/scraping', apiController.getScraping);
 app.get('/api/goodnews', apiController.getGoodNews);
 app.get('/api/twilio', apiController.getTwilio);
-//app.post('/api/twilio', apiController.postTwilio);
+app.post('/api/twilio', apiController.postTwilio);
 app.get('/api/clockwork', apiController.getClockwork);
 //app.post('/api/clockwork', apiController.postClockwork);
 app.get('/api/foursquare', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFoursquare);

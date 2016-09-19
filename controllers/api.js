@@ -133,7 +133,7 @@ exports.getScraping = (req, res) => {
   request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
     const $ = cheerio.load(body);
     const links = [];
-    $('.card__headlines a[href^="http"]').each((index, element) => {
+    $('.card a[href^="http"]').each((index, element) => {
       links.push($(element));
     });
     res.render('api/scraping', {
@@ -150,7 +150,7 @@ exports.getScraping = (req, res) => {
 exports.getGoodNews = (req, res, next) => {
   const links = [];
   const links_hp = [];
-  const links_gn = [];
+  const links_gn = []
   async.parallel({
     getReddit: (done) => {
       request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {
@@ -181,7 +181,8 @@ exports.getGoodNews = (req, res, next) => {
         });
         done(err, links_gn);
       });
-    }  
+    } 
+
   },
   (err, results) => {
     if (err)  { return next(err); }

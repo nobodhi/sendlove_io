@@ -42,9 +42,9 @@ block content
         th №
         th Title
     tbody
-      each link, index in links_hp.reverse()
+      each link, index in links_hp
         tr
           td= index + 1
           td!= link
           if (index > 20)
-            - break;
+            - break;   
