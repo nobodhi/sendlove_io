@@ -34,19 +34,38 @@ exports.getApi = (req, res) => {
   });
 };
 
+
+
+/*
+  GET /api/map
+  display the map 
+*/
+exports.getMap = (req, res) => {
+  res.render('api/map', {
+    title: 'World Wide Map of Intentions - SendLove.io'
+  });
+};
+
+/*
+  POST /api/map
+  Choose a workout from the map
+
+*/
+
+
 /*
   GET /api/recipient
   add a recipient to a workout
 */
 exports.getRecipient = (req, res) => {
   res.render('api/recipient', {
-    title: 'SendLove I/O - recipient'
+    title: 'Recipient - SendLove.io'
   });
 };
 
 /*
-  POST /api/workout
-  Create a new workout on api.sendlove.io and return it to the user
+  POST /api/recipient
+  Add a new recipient on api.sendlove.io
 
 */
 
@@ -59,7 +78,7 @@ exports.getRecipient = (req, res) => {
 */
 exports.getWorkout = (req, res) => {
   res.render('api/workout', {
-    title: 'SendLove I/O - workout'
+    title: 'Workout - SendLove.io'
   });
 };
 
@@ -78,7 +97,7 @@ exports.getWorkout = (req, res) => {
 */
 exports.getMessage = (req, res) => {
   res.render('api/message', {
-    title: 'SendLove I/O - message'
+    title: 'Message - SendLove.io'
   });
 };
 
