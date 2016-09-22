@@ -178,8 +178,8 @@ app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe
 app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
 app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
 app.post('/api/upload', passportConfig.isAuthenticated, upload.single('myFile'), apiController.postFileUpload);
-//app.post('/api/workout', passportConfig.isAuthenticated, apiController.postWorkout);
-//app.post('/api/recipient', passportConfig.isAuthenticated, apiController.postRecipient);
+app.post('/api/workout', passportConfig.isAuthenticated, apiController.postWorkout);
+app.post('/api/recipient', passportConfig.isAuthenticated, apiController.postRecipient);
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
 
 /*

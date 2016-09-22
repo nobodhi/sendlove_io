@@ -51,49 +51,13 @@ exports.getMap = (req, res) => {
   Choose a workout from the map
 
 */
-
-
-/*
-  GET /api/recipient
-  add a recipient to a workout
-*/
-exports.getRecipient = (req, res) => {
-  res.render('api/recipient', {
-    title: 'Recipient - SendLove.io'
-  });
+exports.postMap = (req, res) => {
+  res.redirect('/api/workout');
 };
-
-/*
-  POST /api/recipient
-  Add a new recipient on api.sendlove.io
-
-*/
-
-
-
-
-/*
-  GET /api/workout
-  Retrieve user's workouts from api.sendlove.io and return them to the user
-*/
-exports.getWorkout = (req, res) => {
-  res.render('api/workout', {
-    title: 'Workout - SendLove.io'
-  });
-};
-
-/*
-  POST /api/workout
-  Create a new workout on api.sendlove.io and return it to the user
-
-*/
-
-
-
 
 /*
   GET /api/message
-  send message page
+  Send a message to a recipient
 */
 exports.getMessage = (req, res) => {
   res.render('api/message', {
@@ -130,7 +94,44 @@ exports.postMessage = (req, res, next) => {
   });
 };
 
+/*
+  GET /api/recipient
+  add a recipient to a workout
+*/
+exports.getRecipient = (req, res) => {
+  res.render('api/recipient', {
+    title: 'Recipient - SendLove.io'
+  });
+};
 
+/*
+  POST /api/recipient
+  Add a new recipient on api.sendlove.io
+
+*/
+exports.postRecipient = (req, res) => {
+  res.redirect('/api/message');
+};
+
+
+/*
+  GET /api/workout
+  Retrieve user's workouts from api.sendlove.io and return them to the user
+*/
+exports.getWorkout = (req, res) => {
+  res.render('api/workout', {
+    title: 'Workout - SendLove.io'
+  });
+};
+
+/*
+  POST /api/workout
+  Create a new workout on api.sendlove.io and return it to the user
+
+*/
+exports.postWorkout = (req, res) => {
+  res.redirect('/api/recipient');
+};
 
 
 /*
@@ -141,50 +142,51 @@ exports.getGoodNews = (req, res, next) => {
   const links = [];
   const links_hp = [];
   const links_gn = []
-  async.parallel({
-    getReddit: (done) => {
-      request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {
-        const $ = cheerio.load(body);
-        $('.title a[href^="http"]').each((index, element) => {
-          links.push($(element));
-          
+  async.parallel(
+    {
+      getReddit: (done) => {
+        request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {
+          const $ = cheerio.load(body);
+          $('.title a[href^="http"]').each((index, element) => {
+            links.push($(element));
+            
+          });
+          done(err, links);
         });
-        done(err, links);
-      });
-    }, 
-    getHP: (done) => {
-      request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
-        const $ = cheerio.load(body);
-        $('.card__headlines a[href^="http"]').each((index, element) => {
-          links_hp.push($(element));
-          
+      }, 
+      getHP: (done) => {
+        request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
+          const $ = cheerio.load(body);
+          $('.card__headlines a[href^="http"]').each((index, element) => {
+            links_hp.push($(element));
+            
+          });
+          done(err, links_hp);
         });
-        done(err, links_hp);
-      });
-    }, 
-    getGN: (done) => {
-      request.get('http://www.goodnewsnetwork.org/', (err, request, body) => {
-        const $ = cheerio.load(body);
-        $('.entry-title a[href^="http"]').each((index, element) => {
-          links_gn.push($(element));
-          
+      }, 
+      getGN: (done) => {
+        request.get('http://www.goodnewsnetwork.org/', (err, request, body) => {
+          const $ = cheerio.load(body);
+          $('.entry-title a[href^="http"]').each((index, element) => {
+            links_gn.push($(element));
+            
+          });
+          done(err, links_gn);
         });
-        done(err, links_gn);
+      } 
+    },
+    (err, results) => {
+      if (err)  { return next(err); }
+      //const links = { results.getReddit.links };
+      //const links_hp = { results.getHP.links };
+      res.render('api/goodnews', {
+        title: "Good News",
+        links: results.getReddit,
+        links_hp: results.getHP,
+        links_gn: results.getGN
       });
-    } 
-
-  },
-  (err, results) => {
-    if (err)  { return next(err); }
-    //const links = { results.getReddit.links };
-    //const links_hp = { results.getHP.links };
-    res.render('api/goodnews', {
-      title: "Good News",
-      links: results.getReddit,
-      links_hp: results.getHP,
-      links_gn: results.getGN
-    });
-  });
+    }
+  );
 };
 /*
   request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {

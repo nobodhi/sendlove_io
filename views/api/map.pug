@@ -32,130 +32,163 @@ block content
         location: 'Fremont',
         latitude: 37.49267,
         longitude: -121.94409
+        ,targetUrl: '/api/workout'
       },
+      ,
       {
         location: 'Folsom',
         latitude: 38.64392,
         longitude: -121.18621
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Gilroy',
         latitude: 37.02615,
         longitude: -121.56487
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Harris Ranch',
         latitude: 36.25316,
         longitude: -120.23853
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Mt. Shasta',
         latitude: 41.30981,
-        longitude: -122.31766
+        longitude: -122.31766,
+        url: '/workout'
       },
       {
         location: 'Roseville',
         latitude: 38.77344,
         longitude: -121.26928
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Truckee',
         latitude: 39.32720,
         longitude: -120.20643
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Vacaville',
         latitude: 38.36720,
         longitude: -121.95601
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Atascadero',
         latitude: 35.48640,
         longitude: -120.66558
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Barstow',
         latitude: 34.89120,
         longitude: -116.99910
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Buellton',
         latitude: 34.61545,
         longitude: -120.18856
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Cabazon',
         latitude: 33.92967,
         longitude: -116.81649
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Culver City',
         latitude: 33.98465,
         longitude: -118.39505
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'El Centro',
         latitude: 32.76200,
         longitude: -115.53197
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Indio',
         latitude: 33.74272,
         longitude: -116.21316
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Los Angeles',
         latitude: 33.92142,
         longitude: -118.32982
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Needles',
         latitude: 34.85083,
         longitude: -114.62414
+        ,targetUrl: '/api/workout'
       },
-
       {
         location: 'Oxnard',
         latitude: 34.24075,
         longitude: -119.17699
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Rancho Cucamonga',
         latitude: 34.11348,
         longitude: -117.53257
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'San Juan Capistrano',
         latitude: 33.49835,
         longitude: -117.66287
+        ,targetUrl: '/api/workout'
       },
       {
         location: 'Tejon Ranch',
         latitude: 34.98661,
         longitude: -118.94630
+        ,targetUrl: '/api/workout'
       }
     ];
 
+   
+    
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 36.0907578, lng: -119.5948303 },
         zoom: 6
       });
 
+
+      
       superchargers.forEach(function(sc) {
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(sc.latitude, sc.longitude),
           icon: {
             url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAjCAIAAABpW9/5AAAABnRSTlMAAAAAAABupgeRAAAACXBIWXMAARxbAAEcWwEUN6FaAAACMElEQVRYw8XXS0hVURTG8d89V4uiMEWwib0GlgVqYGJlgyQsKsJJkyCoYeYsgwZBRYMG2aShCRHUrBcR5UAIkuhB5ZN0koNASCsqDEsra2DJTb2Pc1PvNzrsvdb+7732Y60T8a8iVLGXMpaDt3RwjzbGJdEaaiijgIBBurjP62mWkSluZymNM2gfZ+iO01vIcarj9LZyjsGYlujkVyXNFMZfTT61vKN3WtcOmihKGIl9vIxh/wEXc4nFySIZsJ0hXsU07uE8C5L5LmInD/kwGeqF3GCVVPWDw7SDEq6QnbJvP/sZnVjxQXYLoYByrpNFM3lhfHP5QgfRKI0sEU45DFPKLqFVxFWyKiiQjg4RpOWYz2aytkpT+dLXFoL1MqANBCsyAS4kyMsEOJcgOxPgLIJvmQB/JRjIBPgNQXsmwC8IWjIBvkvwjJ75pT6mayJJ9FGb7vsXViPU83kCPMQw2+ae+pMGOmMLgW7GqZhL6ndO0Dq99HnOIFWxTbOn99TTNmPNhV4eUc6yWaU+oG5aoTl1eUPcJJuS2ThuHznNRUYSl7exWstJNqaL/MVtLvApjkEkcW1VyzFyQlIHOMWThDbRxLPu5Q4rWZ0ytYU6+pOZRVO58i0MU5ls18dppJGxFOaX6t3popPq+IX7KA3cSjkwkVCbV0wTuTPl13qehhkqEva4ruMyS2NaxjgSkpqmNtFODz10UzOfqe3AX/DRec7kEZq4NjcPe/JfoNL/cP8N53lwp5gXjtsAAAAASUVORK5CYII=',
-            scaledSize: new google.maps.Size(22, 20)
+            scaledSize: new google.maps.Size(22, 20),
           },
           map: map,
           title: sc.location,
+          targetUrl: sc.targetUrl,
           animation: google.maps.Animation.DROP
         });
-      });
-    }
 
+        window.google.maps.event.addListener(marker, 'click', function() {
+            window.location.href =  marker.targetUrl;
+        });
+
+      });
+
+      
+    }
+    
 
   script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBOukJlvI_qFJMUpeol0u-SOtRlySx_4DE&callback=initMap')
  
