@@ -1,0 +1,53 @@
+extends ../layout
+
+block content
+  .page-header
+    h2
+      i.fa.fa-power-off
+      | SendLove.io - Create a Workout
+
+  .btn-group.btn-group-justified
+    a.btn.btn-primary(href='https://www.facebook.com/sendlove.io', target='_blank')
+      i.fa.fa-check-square-o
+      | Some Cool Page
+    a.btn.btn-primary(href='https://www.instagram.com/sendlove.io/', target='_blank')
+      i.fa.fa-question-circle-o 
+      | Another Cool Page
+
+  br
+  p <a href="/api/workout">Workout</a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> 
+    
+  .row
+    .col-sm-6
+      form(role='form', method='POST')
+        br
+        input(type='hidden', name='_csrf', value=_csrf)
+        input(type='hidden', name='personId', value=user.id) 
+        p=user.id 
+        .form-group
+          .input-group
+            label.control-label Name 
+            input.form-control(name='telephone', autofocus, type='text', size='20', placeholder='Give it a cool name')
+        .form-group
+          .input-group
+            label.control-label Description
+            textarea.form-control(name='message',  cols='35', rows='3', placeholder='Give it a great description')
+        .form-group
+          .input-group
+            label.control-label Latitude & &nbsp; 
+            input.form-control(name='latitude', type='text', size='3', placeholder='Your workout\'s latitude')
+            label.control-label Longitude
+            input.form-control(name='longitude', type='text', size='3', placeholder='Your workout\'s longitude')
+        .form-group
+          .input-group
+            label.control-label Image URL
+            input.form-control(name='imageurl', type='text', size='45', placeholder='URL path to a nice picture')
+        .form-group
+          .input-group
+            label.control-label Category
+            input.form-control(name='category', type='text', size='20', placeholder='Add a category')
+        .form-group
+          .input-group
+            button.btn.btn-default(type='submit')
+              i.fa.fa-location-arrow
+              | Send            

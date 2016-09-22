@@ -24,129 +24,100 @@ const foursquare = require('node-foursquare')({
   }
 });
 
-/**
- * GET /api
- * List of API examples.
- */
+/*
+  GET /api
+  List of API examples.
+*/
 exports.getApi = (req, res) => {
   res.render('api/index', {
     title: 'API Examples'
   });
 };
 
-/**
- * GET /api/foursquare
- * Foursquare API example.
- */
-exports.getFoursquare = (req, res, next) => {
-  const token = req.user.tokens.find(token => token.kind === 'foursquare');
-  async.parallel({
-    trendingVenues: (callback) => {
-      foursquare.Venues.getTrending('40.7222756', '-74.0022724', { limit: 50 }, token.accessToken, (err, results) => {
-        callback(err, results);
-      });
-    },
-    venueDetail: (callback) => {
-      foursquare.Venues.getVenue('49da74aef964a5208b5e1fe3', token.accessToken, (err, results) => {
-        callback(err, results);
-      });
-    },
-    userCheckins: (callback) => {
-      foursquare.Users.getCheckins('self', null, token.accessToken, (err, results) => {
-        callback(err, results);
-      });
-    }
-  },
-  (err, results) => {
-    if (err) { return next(err); }
-    res.render('api/foursquare', {
-      title: 'Foursquare API',
-      trendingVenues: results.trendingVenues,
-      venueDetail: results.venueDetail,
-      userCheckins: results.userCheckins
-    });
+/*
+  GET /api/recipient
+  add a recipient to a workout
+*/
+exports.getRecipient = (req, res) => {
+  res.render('api/recipient', {
+    title: 'SendLove I/O - recipient'
   });
 };
 
-/**
- * GET /api/tumblr
- * Tumblr API example.
- */
-exports.getTumblr = (req, res, next) => {
-  const token = req.user.tokens.find(token => token.kind === 'tumblr');
-  const client = tumblr.createClient({
-    consumer_key: process.env.TUMBLR_KEY,
-    consumer_secret: process.env.TUMBLR_SECRET,
-    token: token.accessToken,
-    token_secret: token.tokenSecret
-  });
-  client.posts('mmosdotcom.tumblr.com', { type: 'photo' }, (err, data) => {
-    if (err) { return next(err); }
-    res.render('api/tumblr', {
-      title: 'Tumblr API',
-      blog: data.blog,
-      photoset: data.posts[0].photos
-    });
+/*
+  POST /api/workout
+  Create a new workout on api.sendlove.io and return it to the user
+
+*/
+
+
+
+
+/*
+  GET /api/workout
+  Retrieve user's workouts from api.sendlove.io and return them to the user
+*/
+exports.getWorkout = (req, res) => {
+  res.render('api/workout', {
+    title: 'SendLove I/O - workout'
   });
 };
 
-/**
- * GET /api/facebook
- * Facebook API example.
- */
-exports.getFacebook = (req, res, next) => {
-  const token = req.user.tokens.find(token => token.kind === 'facebook');
-  graph.setAccessToken(token.accessToken);
-  async.parallel({
-    getMyProfile: (done) => {
-      graph.get(`${req.user.facebook}?fields=id,name,email,first_name,last_name,gender,link,locale,timezone`, (err, me) => {
-        done(err, me);
-      });
-    },
-    getMyFriends: (done) => {
-      graph.get(`${req.user.facebook}/friends`, (err, friends) => {
-        done(err, friends.data);
-      });
-    },
-    getMyTaggableFriends: (done) => {
-      graph.get(`${req.user.facebook}/taggable_friends`, (err, taggable_friends) => {
-        done(err, taggable_friends.data);
-      });
-    }
-  },
-  (err, results) => {
-    if (err) { return next(err); }
-    res.render('api/facebook', {
-      title: 'Facebook API',
-      me: results.getMyProfile,
-      friends: results.getMyFriends,
-      taggable_friends: results.getMyTaggableFriends
-    });
+/*
+  POST /api/workout
+  Create a new workout on api.sendlove.io and return it to the user
+
+*/
+
+
+
+
+/*
+  GET /api/message
+  send message page
+*/
+exports.getMessage = (req, res) => {
+  res.render('api/message', {
+    title: 'SendLove I/O - message'
   });
 };
 
-/**
- * GET /api/scraping
- * Web scraping example using Cheerio library.
- */
-exports.getScraping = (req, res) => {
-  request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
-    const $ = cheerio.load(body);
-    const links = [];
-    $('.card a[href^="http"]').each((index, element) => {
-      links.push($(element));
-    });
-    res.render('api/scraping', {
-      title: 'Web Scraping',
-      links
-    });
+/*
+  POST /api/message
+  Create a new message and send it
+
+*/
+exports.postMessage = (req, res, next) => {
+  req.assert('telephone', 'Phone number is required.').notEmpty();
+  req.assert('message', 'Message cannot be blank.').notEmpty();
+
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/api/message');
+  }
+
+  const message = {
+    to: req.body.telephone,
+    from: '+16233350027',
+    body: req.body.message + " - sent via SendLove.io"
+  };
+  
+  twilio.sendMessage(message, (err, responseData) => {
+    if (err) { return next(err.message); }
+    req.flash('success', { msg: `Text sent to ${responseData.to}.` });
+    res.redirect('/api/message');
   });
 };
 
-/**
- * GET /api/goodnews
- * Web scraping example using Cheerio library.
- */
+
+
+
+/*
+  GET /api/goodnews
+  Web scraping example using Cheerio library.
+*/
 exports.getGoodNews = (req, res, next) => {
   const links = [];
   const links_hp = [];
@@ -218,10 +189,123 @@ exports.getGoodNews = (req, res, next) => {
 
 
 
-/**
- * GET /api/github
- * GitHub API Example.
- */
+
+
+/*
+  GET /api/foursquare
+  Foursquare API example.
+*/
+exports.getFoursquare = (req, res, next) => {
+  const token = req.user.tokens.find(token => token.kind === 'foursquare');
+  async.parallel({
+    trendingVenues: (callback) => {
+      foursquare.Venues.getTrending('40.7222756', '-74.0022724', { limit: 50 }, token.accessToken, (err, results) => {
+        callback(err, results);
+      });
+    },
+    venueDetail: (callback) => {
+      foursquare.Venues.getVenue('49da74aef964a5208b5e1fe3', token.accessToken, (err, results) => {
+        callback(err, results);
+      });
+    },
+    userCheckins: (callback) => {
+      foursquare.Users.getCheckins('self', null, token.accessToken, (err, results) => {
+        callback(err, results);
+      });
+    }
+  },
+  (err, results) => {
+    if (err) { return next(err); }
+    res.render('api/foursquare', {
+      title: 'Foursquare API',
+      trendingVenues: results.trendingVenues,
+      venueDetail: results.venueDetail,
+      userCheckins: results.userCheckins
+    });
+  });
+};
+
+/*
+  GET /api/tumblr
+  Tumblr API example.
+*/
+exports.getTumblr = (req, res, next) => {
+  const token = req.user.tokens.find(token => token.kind === 'tumblr');
+  const client = tumblr.createClient({
+    consumer_key: process.env.TUMBLR_KEY,
+    consumer_secret: process.env.TUMBLR_SECRET,
+    token: token.accessToken,
+    token_secret: token.tokenSecret
+  });
+  client.posts('mmosdotcom.tumblr.com', { type: 'photo' }, (err, data) => {
+    if (err) { return next(err); }
+    res.render('api/tumblr', {
+      title: 'Tumblr API',
+      blog: data.blog,
+      photoset: data.posts[0].photos
+    });
+  });
+};
+
+/*
+  GET /api/facebook
+  Facebook API example.
+*/
+exports.getFacebook = (req, res, next) => {
+  const token = req.user.tokens.find(token => token.kind === 'facebook');
+  graph.setAccessToken(token.accessToken);
+  async.parallel({
+    getMyProfile: (done) => {
+      graph.get(`${req.user.facebook}?fields=id,name,email,first_name,last_name,gender,link,locale,timezone`, (err, me) => {
+        done(err, me);
+      });
+    },
+    getMyFriends: (done) => {
+      graph.get(`${req.user.facebook}/friends`, (err, friends) => {
+        done(err, friends.data);
+      });
+    },
+    getMyTaggableFriends: (done) => {
+      graph.get(`${req.user.facebook}/taggable_friends`, (err, taggable_friends) => {
+        done(err, taggable_friends.data);
+      });
+    }
+  },
+  (err, results) => {
+    if (err) { return next(err); }
+    res.render('api/facebook', {
+      title: 'Facebook API',
+      me: results.getMyProfile,
+      friends: results.getMyFriends,
+      taggable_friends: results.getMyTaggableFriends
+    });
+  });
+};
+
+/*
+  GET /api/scraping
+  Web scraping example using Cheerio library.
+*/
+exports.getScraping = (req, res) => {
+  request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
+    const $ = cheerio.load(body);
+    const links = [];
+    $('.card a[href^="http"]').each((index, element) => {
+      links.push($(element));
+    });
+    res.render('api/scraping', {
+      title: 'Web Scraping',
+      links
+    });
+  });
+};
+
+
+
+/*
+  GET /api/github
+  GitHub API Example.
+*/
 exports.getGithub = (req, res, next) => {
   const token = req.user.tokens.find(token => token.kind === 'github');
   const github = new Github({ token: token.accessToken });
@@ -235,20 +319,20 @@ exports.getGithub = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/aviary
- * Aviary image processing example.
- */
+/*
+  GET /api/aviary
+  Aviary image processing example.
+*/
 exports.getAviary = (req, res) => {
   res.render('api/aviary', {
     title: 'Aviary API'
   });
 };
 
-/**
- * GET /api/nyt
- * New York Times API example.
- */
+/*
+  GET /api/nyt
+  New York Times API example.
+*/
 exports.getNewYorkTimes = (req, res, next) => {
   const query = {
     'list-name': 'young-adult',
@@ -266,10 +350,10 @@ exports.getNewYorkTimes = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/lastfm
- * Last.fm API example.
- */
+/*
+  GET /api/lastfm
+  Last.fm API example.
+*/
 exports.getLastfm = (req, res, next) => {
   const lastfm = new LastFmNode({
     api_key: process.env.LASTFM_KEY,
@@ -323,10 +407,10 @@ exports.getLastfm = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/twitter
- * Twitter API example.
- */
+/*
+  GET /api/twitter
+  Twitter API example.
+*/
 exports.getTwitter = (req, res, next) => {
   const token = req.user.tokens.find(token => token.kind === 'twitter');
   const T = new Twit({
@@ -344,10 +428,10 @@ exports.getTwitter = (req, res, next) => {
   });
 };
 
-/**
- * POST /api/twitter
- * Post a tweet.
- */
+/*
+  POST /api/twitter
+  Post a tweet.
+*/
 exports.postTwitter = (req, res, next) => {
   req.assert('tweet', 'Tweet cannot be empty').notEmpty();
 
@@ -372,10 +456,10 @@ exports.postTwitter = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/steam
- * Steam API example.
- */
+/*
+  GET /api/steam
+  Steam API example.
+*/
 exports.getSteam = (req, res, next) => {
   const steamId = '76561197982488301';
   const params = { l: 'english', steamid: steamId, key: process.env.STEAM_KEY };
@@ -420,10 +504,10 @@ exports.getSteam = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/stripe
- * Stripe API example.
- */
+/*
+  GET /api/stripe
+  Stripe API example.
+*/
 exports.getStripe = (req, res) => {
   res.render('api/stripe', {
     title: 'Stripe API',
@@ -431,10 +515,10 @@ exports.getStripe = (req, res) => {
   });
 };
 
-/**
- * POST /api/stripe
- * Make a payment.
- */
+/*
+  POST /api/stripe
+  Make a payment.
+*/
 exports.postStripe = (req, res) => {
   const stripeToken = req.body.stripeToken;
   const stripeEmail = req.body.stripeEmail;
@@ -453,22 +537,22 @@ exports.postStripe = (req, res) => {
   });
 };
 
-/**
- * GET /api/twilio
- * Twilio API example.
- */
+/*
+  GET /api/twilio
+  Twilio API example.
+*/
 exports.getTwilio = (req, res) => {
   res.render('api/twilio', {
     title: 'Twilio API'
   });
 };
 
-/**
- * POST /api/twilio
- * Send a text message using Twilio.
- */
+/*
+  POST /api/twilio
+  Send a text message using Twilio.
+*/
 exports.postTwilio = (req, res, next) => {
-  req.assert('number', 'Phone number is required.').notEmpty();
+  req.assert('telephone', 'Phone number is required.').notEmpty();
   req.assert('message', 'Message cannot be blank.').notEmpty();
 
   const errors = req.validationErrors();
@@ -479,7 +563,7 @@ exports.postTwilio = (req, res, next) => {
   }
 
   const message = {
-    to: req.body.number,
+    to: req.body.telephone,
     from: '+16233350027',
     body: req.body.message
   };
@@ -490,24 +574,24 @@ exports.postTwilio = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/clockwork
- * Clockwork SMS API example.
- */
+/*
+  GET /api/clockwork
+  Clockwork SMS API example.
+*/
 exports.getClockwork = (req, res) => {
   res.render('api/clockwork', {
     title: 'Clockwork SMS API'
   });
 };
 
-/**
- * POST /api/clockwork
- * Send a text message using Clockwork SMS
- */
+/*
+  POST /api/clockwork
+  Send a text message using Clockwork SMS
+*/
 exports.postClockwork = (req, res, next) => {
   const message = {
     To: req.body.telephone,
-    From: 'SendLoveIO', // defaults to 43704 in the USA. We could include a field for this?
+    From: 'SendLove.io',  
     Content: req.body.message
   };
   clockwork.sendSms(message, (err, responseData) => {
@@ -517,10 +601,10 @@ exports.postClockwork = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/linkedin
- * LinkedIn API example.
- */
+/*
+  GET /api/linkedin
+  LinkedIn API example.
+*/
 exports.getLinkedin = (req, res, next) => {
   const token = req.user.tokens.find(token => token.kind === 'linkedin');
   const linkedin = Linkedin.init(token.accessToken);
@@ -533,10 +617,10 @@ exports.getLinkedin = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/instagram
- * Instagram API example.
- */
+/*
+  GET /api/instagram
+  Instagram API example.
+*/
 exports.getInstagram = (req, res, next) => {
   const token = req.user.tokens.find(token => token.kind === 'instagram');
   ig.use({ client_id: process.env.INSTAGRAM_ID, client_secret: process.env.INSTAGRAM_SECRET });
@@ -574,10 +658,10 @@ exports.getInstagram = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/paypal
- * PayPal SDK example.
- */
+/*
+  GET /api/paypal
+  PayPal SDK example.
+*/
 exports.getPayPal = (req, res, next) => {
   paypal.configure({
     mode: 'sandbox',
@@ -617,10 +701,10 @@ exports.getPayPal = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/paypal/success
- * PayPal SDK example.
- */
+/*
+  GET /api/paypal/success
+  PayPal SDK example.
+*/
 exports.getPayPalSuccess = (req, res) => {
   const paymentId = req.session.paymentId;
   const paymentDetails = { payer_id: req.query.PayerID };
@@ -632,10 +716,10 @@ exports.getPayPalSuccess = (req, res) => {
   });
 };
 
-/**
- * GET /api/paypal/cancel
- * PayPal SDK example.
- */
+/*
+  GET /api/paypal/cancel
+  PayPal SDK example.
+*/
 exports.getPayPalCancel = (req, res) => {
   req.session.paymentId = null;
   res.render('api/paypal', {
@@ -644,10 +728,10 @@ exports.getPayPalCancel = (req, res) => {
   });
 };
 
-/**
- * GET /api/lob
- * Lob API example.
- */
+/*
+  GET /api/lob
+  Lob API example.
+*/
 exports.getLob = (req, res, next) => {
   lob.routes.list({ zip_codes: ['10007'] }, (err, routes) => {
     if (err) { return next(err); }
@@ -658,10 +742,10 @@ exports.getLob = (req, res, next) => {
   });
 };
 
-/**
- * GET /api/upload
- * File Upload API example.
- */
+/*
+  GET /api/upload
+  File Upload API example.
+*/
  
 exports.getFileUpload = (req, res, next) => {
   res.render('api/upload', {
@@ -674,10 +758,10 @@ exports.postFileUpload = (req, res, next) => {
   res.redirect('/api/upload');
 };
 
-/**
- * GET /api/pinterest
- * Pinterest API example.
- */
+/*
+  GET /api/pinterest
+  Pinterest API example.
+*/
 exports.getPinterest = (req, res, next) => {
   const token = req.user.tokens.find(token => token.kind === 'pinterest');
   request.get({ url: 'https://api.pinterest.com/v1/me/boards/', qs: { access_token: token.accessToken }, json: true }, (err, request, body) => {
@@ -689,10 +773,10 @@ exports.getPinterest = (req, res, next) => {
   });
 };
 
-/**
- * POST /api/pinterest
- * Create a pin.
- */
+/*
+  POST /api/pinterest
+  Create a pin.
+*/
 exports.postPinterest = (req, res, next) => {
   req.assert('board', 'Board is required.').notEmpty();
   req.assert('note', 'Note cannot be blank.').notEmpty();

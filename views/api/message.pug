@@ -1,0 +1,39 @@
+extends ../layout
+
+block content
+  .page-header
+    h2
+      i.fa.fa-phone
+      | SendLove.io - Create a Message
+
+  .btn-group.btn-group-justified
+    a.btn.btn-primary(href='https://www.facebook.com/sendlove.io', target='_blank')
+      i.fa.fa-check-square-o
+      | Some Cool Page
+    a.btn.btn-primary(href='https://www.instagram.com/sendlove.io/', target='_blank')
+      i.fa.fa-question-circle-o 
+      | Another Cool Page
+
+  br
+  p <a href="/api/workout">Workout</a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> 
+  
+  .row
+    .col-sm-6
+      form(role='form', method='POST')
+        br
+        input(type='hidden', name='_csrf', value=_csrf)
+        input(type='hidden', name='personId', value=user.id) 
+        p=user.id
+        .form-group
+          .input-group
+            label.control-label Number to text
+            input.form-control(autofocus, type='text', size='20', name='telephone', placeholder='Mobile number (international format):')
+        .form-group
+          .input-group
+            label.control-label Message
+            textarea.form-control(name='message',  cols='35', rows='3', placeholder='Message to send:')
+        .form-group
+          .input-group
+            button.btn.btn-default(type='submit')
+              i.fa.fa-location-arrow
+              | Send            
