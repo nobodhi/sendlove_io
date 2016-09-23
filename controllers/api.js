@@ -150,15 +150,15 @@ exports.postWorkout = (req, res, next) => {
     name: req.body.category
   };
 
-  request.post(process.env.API_URL, { qs: { access_token: "TODO" }, form: formData }, (err, request, body) => {
-    if (err) { return next(err); }
+  //request.post(process.env.API_URL, { qs: { access_token: "TODO" }, form: formData }, (err, request, body) => {
+    //if (err) { return next(err); }
     //if (request.statusCode !== 201) {
     //  req.flash('errors', { msg: "An error occured with status code " + request.statusCode });
     //  return res.redirect('/api/workout');
     //}
-    req.flash('success', { msg: 'Workout created!' });
+    //req.flash('success', { msg: 'Workout created!' });
     res.redirect('/api/recipient');
-  });
+  //});
 }
 
 
