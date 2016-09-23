@@ -129,9 +129,38 @@ exports.getWorkout = (req, res) => {
   Create a new workout on api.sendlove.io and return it to the user
 
 */
-exports.postWorkout = (req, res) => {
-  res.redirect('/api/recipient');
-};
+exports.postWorkout = (req, res, next) => {
+  req.assert('name', 'Please include a name').notEmpty();
+  req.assert('latitude', 'Please include a latitude').notEmpty();
+  req.assert('longitude', 'Please include a longitude').notEmpty();
+  
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/api/workout');
+  }
+
+  const formData = {
+    name: req.body.name,
+    description: req.body.description,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude,
+    imageurl: req.body.imageurl,
+    name: req.body.category
+  };
+
+  request.post(process.env.API_URL, { qs: { access_token: "TODO" }, form: formData }, (err, request, body) => {
+    if (err) { return next(err); }
+    if (request.statusCode !== 201) {
+      // req.flash('errors', { msg: JSON.parse(body).message });
+      req.flash('errors', { msg: "An error occured with status code " + request.statusCode });
+      return res.redirect('/api/workout');
+    }
+    req.flash('success', { msg: 'Workout created!' });
+    res.redirect('/api/recipient');
+  });
+}
 
 
 /*

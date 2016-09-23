@@ -9,19 +9,19 @@ block content
 
   .page-header
     h2
-      i.fa.fa-globe
+      i.fa.fa-map
       | Map - Sendlove.io
 
   .btn-group.btn-group-justified
     a.btn.btn-primary(href='https://www.facebook.com/sendlove.io', target='_blank')
-      i.fa.fa-check-square-o
-      | Some Cool Page
-    a.btn.btn-primary(href='https://www.instagram.com/sendlove.io/', target='_blank')
+      i.fa.fa-share
+      | Share your intention!
+    a.btn.btn-primary(href='/', target='_blank')
       i.fa.fa-question-circle-o 
-      | Another Cool Page
+      | How does it work?
 
   br
-  p <a href="/api/workout">Workout</a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> > <a href="/api/map">Map</a> 
+  p <a href="/api/workout">Intention</a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> > <a href="/api/map"><b>Map</b></a> 
 
   #map
 
@@ -29,130 +29,21 @@ block content
     var map;
     var superchargers = [
       {
-        location: 'Fremont',
-        latitude: 37.49267,
-        longitude: -121.94409
+        location: 'RONS Club',
+        latitude: 33.487569,
+        longitude: -112.095390
         ,targetUrl: '/api/workout'
-      },
-      ,
-      {
-        location: 'Folsom',
-        latitude: 38.64392,
-        longitude: -121.18621
+      }
+      ,{
+        location: 'Belltown',
+        latitude: 47.613138,
+        longitude: -122.345858
         ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Gilroy',
-        latitude: 37.02615,
-        longitude: -121.56487
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Harris Ranch',
-        latitude: 36.25316,
-        longitude: -120.23853
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Mt. Shasta',
-        latitude: 41.30981,
-        longitude: -122.31766,
-        url: '/workout'
-      },
-      {
-        location: 'Roseville',
-        latitude: 38.77344,
-        longitude: -121.26928
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Truckee',
-        latitude: 39.32720,
-        longitude: -120.20643
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Vacaville',
-        latitude: 38.36720,
-        longitude: -121.95601
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Atascadero',
-        latitude: 35.48640,
-        longitude: -120.66558
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Barstow',
-        latitude: 34.89120,
-        longitude: -116.99910
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Buellton',
-        latitude: 34.61545,
-        longitude: -120.18856
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Cabazon',
-        latitude: 33.92967,
-        longitude: -116.81649
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Culver City',
-        latitude: 33.98465,
-        longitude: -118.39505
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'El Centro',
-        latitude: 32.76200,
-        longitude: -115.53197
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Indio',
-        latitude: 33.74272,
-        longitude: -116.21316
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Los Angeles',
-        latitude: 33.92142,
-        longitude: -118.32982
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Needles',
-        latitude: 34.85083,
-        longitude: -114.62414
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Oxnard',
-        latitude: 34.24075,
-        longitude: -119.17699
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Rancho Cucamonga',
-        latitude: 34.11348,
-        longitude: -117.53257
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'San Juan Capistrano',
-        latitude: 33.49835,
-        longitude: -117.66287
-        ,targetUrl: '/api/workout'
-      },
-      {
-        location: 'Tejon Ranch',
-        latitude: 34.98661,
-        longitude: -118.94630
+      }
+      ,{
+        location: 'Hilo',
+        latitude: 19.720818,
+        longitude: -155.078030
         ,targetUrl: '/api/workout'
       }
     ];
@@ -162,7 +53,7 @@ block content
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: 36.0907578, lng: -119.5948303 },
-        zoom: 6
+        zoom: 4
       });
 
 
