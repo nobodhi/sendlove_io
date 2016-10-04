@@ -140,25 +140,43 @@ exports.postWorkout = (req, res, next) => {
     req.flash('errors', errors);
     return res.redirect('/api/workout');
   }
+  
+  const postUrl = process.env.API_URL + '/thing'
 
-  const formData = {
+  //const formData = req.body;
+  var formData = {
     name: req.body.name,
     description: req.body.description,
-    latitude: req.body.latitude,
-    longitude: req.body.longitude,
-    imageurl: req.body.imageurl,
-    name: req.body.category
-  };
-
-  //request.post(process.env.API_URL, { qs: { access_token: "TODO" }, form: formData }, (err, request, body) => {
-    //if (err) { return next(err); }
-    //if (request.statusCode !== 201) {
-    //  req.flash('errors', { msg: "An error occured with status code " + request.statusCode });
-    //  return res.redirect('/api/workout');
-    //}
-    //req.flash('success', { msg: 'Workout created!' });
-    res.redirect('/api/recipient');
-  //});
+    personId: req.body.personId,
+    latitude: Number(req.body.latitude),
+    longitude: Number(req.body.longitude)
+  }
+  
+  var jsonData = JSON.stringify(formData); // "{  \"name\": \"hello, world!\",  \"description\": \"first workout\",  \"personId\": \"57bc9f71cf9c78642abfe952\",  \"latitude\": 33,  \"longitude\": 112, \"image\": \"sendlove.io/images/my_workout.jpg\", \"category\": \"running\", \"altId\": \"0\"}" // JSON.stringify(formData);  
+  
+  request({
+    url: postUrl,
+    method: "POST",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: jsonData
+    }
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+      console.log(formData)
+      console.log(jsonData)
+      console.log(postUrl)
+      if (request.statusCode !== 201 && request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        return res.redirect('/api/workout');
+      }
+      req.flash('success', { msg: 'Workout created!' });
+      res.redirect('/api/recipient');
+    }
+  );
 }
 
 
