@@ -23,6 +23,7 @@ const foursquare = require('node-foursquare')({
     redirectUrl: process.env.FOURSQUARE_REDIRECT_URL
   }
 });
+const geolocator = require('geolocator');
 
 /*
   GET /api
@@ -34,6 +35,20 @@ exports.getApi = (req, res) => {
   });
 };
 
+
+
+/*
+  GET /api/testmap
+  display the testmap 
+*/
+exports.getTestMap = (req, res) => {
+  
+
+  res.render('api/testmap', {
+    title: 'testmap - SendLove.io'
+  });
+  
+};
 
 
 /*
@@ -605,7 +620,8 @@ exports.postStripe = (req, res) => {
 };
 
 /*
-  GET /api/twilio
+  GET /api/
+  
   Twilio API example.
 */
 exports.getTwilio = (req, res) => {

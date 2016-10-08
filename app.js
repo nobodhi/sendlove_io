@@ -167,6 +167,7 @@ app.get('/api/workout', passportConfig.isAuthenticated, apiController.getWorkout
 app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage); 
 app.get('/api/recipient', passportConfig.isAuthenticated, apiController.getRecipient); 
 app.get('/api/map', passportConfig.isAuthenticated, apiController.getMap); 
+app.get('/api/testmap', apiController.getTestMap); // optional login? checks if user.id exists
 
 /*
   API Post Routes
