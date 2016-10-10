@@ -182,6 +182,7 @@ app.post('/api/upload', passportConfig.isAuthenticated, upload.single('myFile'),
 app.post('/api/workout', passportConfig.isAuthenticated, apiController.postWorkout);
 app.post('/api/recipient', passportConfig.isAuthenticated, apiController.postRecipient);
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
+app.post('/api/testmap', apiController.postTestMap); // optional login? checks if user.id exists
 
 /*
   OAuth authentication routes. (Sign in)

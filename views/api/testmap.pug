@@ -1,5 +1,9 @@
 extends ../layout
 
+
+
+
+
 block content
   .page-header
     h2
@@ -17,84 +21,37 @@ block content
   br
   p <a href="/api/workout"><b>Intention</b></a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> > <a href="/api/map">Map</a> 
 
-  .row
-    .col-sm-6  
-      #map-canvas(style="width:600px;height:400px")
-        
-
 
   .row
     .col-sm-6
-      form(role='form', method='POST')
-        br
-        input(type='hidden', name='_csrf', value=_csrf)
-        input(type='hidden', name='personId', value=personId) 
-         
-        .form-group
-          .input-group
-            label.control-label Name 
-            input.form-control(name='name', autofocus, type='text', size='20', placeholder='Give it a cool name')
-        .form-group
-          .input-group
-            label.control-label Description
-            textarea.form-control(name='description',  cols='35', rows='3', placeholder='Give it a great description')
-        .form-group
-          .input-group
-            label.control-label Latitude & &nbsp; 
-            input.form-control(name='latitude', type='text', size='3', placeholder='Your workout\'s latitude')
-            label.control-label Longitude
-            input.form-control(name='longitude', type='text', size='3', placeholder='Your workout\'s longitude')
-        .form-group
-          .input-group
-            label.control-label Image URL
-            input.form-control(name='imagePath', type='text', size='20', placeholder='URL path to a nice picture')
-        .form-group
-          .input-group
-            label.control-label Category
-            input.form-control(name='category', type='text', size='20', placeholder='Add a category')
-        .form-group
-          .input-group
-            button.btn.btn-default(type='submit')
-              i.fa.fa-location-arrow
-              | Send
-  script.
-    var personId=user.id;
-     if (typeof(personId) == 'undefined') {
-      personId="";
-     }
-  script.   
-  
-    geolocator.config({
-        language: "en",
-        google: {
-            version: process.env.GOOGLE_MAPS_VERSION,
-            key: process.env.GOOGLE_MAPS_KEY
-        }
-    });
-    window.onload = function () {
-      var options = {
-          enableHighAccuracy: false,
-          timeout: 5000,
-          maximumWait: 1500,     // max wait time for desired accuracy
-          maximumAge: 0,          // disable cache
-          desiredAccuracy: 100,    // meters
-          fallbackToIP: false,     // fallback to IP if Geolocation fails or rejected
-          addressLookup: false,    // requires Google API key if true
-          timezone: false,         // requires Google API key if true
-          map: "map-canvas",      // interactive map element id (or options object)
-          staticMap: false         // map image URL (boolean or options object) // false => moveable marker?
-      };
-      // If you've enabled map option include the following inside the <body> of your HTML:
-      // <div id="map-canvas" style="width:600px;height:400px"></div>
-      
-      geolocator.locate(options, function (err, location) {
-          if (err) return console.log(err);
-          console.log(location);
-      });
 
-      res.render('api/testmap', {
-        title: 'testmap - SendLove.io'
-      });
-    };
-         
-  script(src='/js/lib/geolocator.min.js')
+
+
+      label.control-label Put it on the map!
+      #map(style="width:600px;height:400px") 
+      #floating-panel
+        input(id="address" type="textbox" placeholder="Search Box")
+        input(id="submit" type="button" value="Find me!")
+    
+
+  script(src='/js/testmap.js')
+  script( async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFYFYds1GEVZ0k_Ob6SzZg76vDVLqP9kc&callback=initMap')
+
+
+  style.
+    #map {
+      height: 100%;
+    }
+    #floating-panel {
+      position: absolute;
+      top: 10px;
+      left: 25%;
+      z-index: 5;
+      background-color: #fff;
+      padding: 5px;
+      border: 1px solid #999;
+      text-align: center;
+      font-family: 'Roboto','sans-serif';
+      line-height: 30px;
+      padding-left: 10px;
+    }

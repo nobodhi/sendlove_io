@@ -23,7 +23,7 @@ const foursquare = require('node-foursquare')({
     redirectUrl: process.env.FOURSQUARE_REDIRECT_URL
   }
 });
-const geolocator = require('geolocator');
+
 
 /*
   GET /api
@@ -42,12 +42,20 @@ exports.getApi = (req, res) => {
   display the testmap 
 */
 exports.getTestMap = (req, res) => {
-  
+    
+    res.render('api/testmap', {
+      title: 'testmap - SendLove.io'
+    });
+    
+};
 
-  res.render('api/testmap', {
-    title: 'testmap - SendLove.io'
-  });
-  
+/*
+  POST /api/testmap
+  Choose a workout from the map
+
+*/
+exports.postTestMap = (req, res) => {
+  res.redirect('/api/testmap');
 };
 
 
