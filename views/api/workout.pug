@@ -22,7 +22,7 @@ block content
       form(role='form', method='POST')
         br
         input(type='hidden', name='_csrf', value=_csrf)
-        input(type='hidden', name='personId', value=user.id) 
+        input(type='hidden', name='personId', value=personId) 
          
         .form-group
           .input-group
@@ -51,3 +51,5 @@ block content
             button.btn.btn-default(type='submit')
               i.fa.fa-location-arrow
               | Send
+  
+  

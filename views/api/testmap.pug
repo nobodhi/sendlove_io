@@ -24,15 +24,20 @@ block content
 
   .row
     .col-sm-6
+      form(role='form', method='POST')
+        br
+        input(type='hidden', name='_csrf', value=_csrf)
+        input(type='hidden', name='personId', value=personId) 
+        input(type='hidden', name='latitude', value='') 
+        input(type='hidden', name='longitude', value='') 
 
-
-
-      label.control-label Put it on the map!
-      #map(style="width:600px;height:400px") 
-      #floating-panel
-        input(id="address" type="textbox" placeholder="Search Box")
-        input(id="submit" type="button" value="Find me!")
-    
+        .form-group
+          label.control-label Put it on the map!
+          #map(style="width:600px;height:400px") 
+          #floating-panel
+            input(id="address" type="textbox" placeholder="Search Box")
+            input(id="submit" type="button" value="Find me!")
+ 
 
   script(src='/js/testmap.js')
   script( async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFYFYds1GEVZ0k_Ob6SzZg76vDVLqP9kc&callback=initMap')

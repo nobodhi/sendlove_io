@@ -32,3 +32,12 @@ html
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
       ga('create', 'UA-83797479-1', 'auto');
       ga('send', 'pageview');
+  
+    script.
+      if (typeof user != "undefined") {
+        personId = user.Id;
+      }
+      else {
+        personId = "";
+      }
+      
