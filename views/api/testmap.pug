@@ -1,9 +1,5 @@
 extends ../layout
 
-
-
-
-
 block content
   .page-header
     h2
@@ -21,16 +17,13 @@ block content
   br
   p <a href="/api/workout"><b>Intention</b></a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> > <a href="/api/map">Map</a> 
 
-
   .row
     .col-sm-6
       form(role='form', method='POST')
-        br
         input(type='hidden', name='_csrf', value=_csrf)
-        input(type='hidden', name='personId', value=personId) 
-        input(type='hidden', name='latitude', value='') 
-        input(type='hidden', name='longitude', value='') 
-
+        input(type='hidden', id='latitude', name='latitude', value=latitude)
+        input(type='hidden', id='longitude', name='longitude', value=longitude)
+        br
         .form-group
           label.control-label Put it on the map!
           #map(style="width:600px;height:400px") 
@@ -41,6 +34,7 @@ block content
 
   script(src='/js/testmap.js')
   script( async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFYFYds1GEVZ0k_Ob6SzZg76vDVLqP9kc&callback=initMap')
+
 
 
   style.

@@ -1,7 +1,8 @@
 var markers = [];
+// latitude and longitude are express locals
 
 function initMap() {
- 
+  
   var map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 36.0907578, lng: -119.5948303 },
     zoom: 4
@@ -10,21 +11,22 @@ function initMap() {
   var geocoder = new google.maps.Geocoder();
 
   
-  // press enter to set the marker 
+  // click submit button
   document.getElementById('submit').addEventListener('click', function() { 
+  
     deleteMarkers();
     geocodeAddress(geocoder, map);
   });
 
-  // press enter to set the marker
-  document.getElementById('address').addEventListener('keypress', function(e) {
-    var key = e.which || e.keyCode;
-    if (key === 13) { // 13 is enter
-      deleteMarkers();
-      geocodeAddress(geocoder, map);
-    }
-  });
-  
+//   // press enter -- doesn't work properly in pug.
+//   document.getElementById('address').addEventListener('keypress', function(e) {
+//     var key = e.which || e.keyCode;
+//     if (key === 13) { // 13 is enter
+//       deleteMarkers();
+//       geocodeAddress(geocoder, map);
+//     }
+//   });
+//   
   // Sets the map on all markers in the array.
   function setMapOnAll(map) {
     for (var i = 0; i < markers.length; i++) {
@@ -64,16 +66,28 @@ function geocodeAddress(geocoder, resultsMap) {
         },        
         draggable: true        
       });
+      // listener runs every time marker is dropped
       google.maps.event.addListener(marker, 'dragend', function(event) {
-         alert( 'Lat: ' + event.latLng.lat() + ' and Longitude is: ' + event.latLng.lng() );
+        latitude = marker.position.lat() ;
+        longitude = marker.position.lng() ;
+        console.log( 'Lat: ' + latitude  + ', lng: ' + longitude);
       });      
+      // lat/lng are set when function is called
       markers.push (marker);
+      latitude = marker.position.lat() ;
+      longitude = marker.position.lng() ;
+      console.log( 'Lat: ' + latitude + ', lng:' + longitude);     
     } else {
-      alert('Location was not successful for the following reason: ' + status);
+      console.log('Location was not successful for the following reason: ' + status);
     }
   });
-  
-
-  
+ 
 }
 
+function modifyInputs() {
+  var latitudeInput = document.getElementById("latitude");
+  var longitudeInput = document.getElementById("longitude");
+  latitudeInput.value = latitude;
+  longitudeInput.value = longitude;
+  //alert('final latitude = ' + latitude.toString() + ', longitude = ' + longitude.toString());
+}

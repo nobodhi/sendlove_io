@@ -42,11 +42,14 @@ exports.getApi = (req, res) => {
   display the testmap 
 */
 exports.getTestMap = (req, res) => {
-    
-    res.render('api/testmap', {
-      title: 'testmap - SendLove.io'
-    });
-    
+  var latitude; 
+  var longitude;
+  res.render('api/testmap', {
+    title: 'testmap - SendLove.io',
+    latitude,
+    longitude
+  });
+  
 };
 
 /*
@@ -143,7 +146,9 @@ exports.postRecipient = (req, res) => {
 */
 exports.getWorkout = (req, res) => {
   res.render('api/workout', {
-    title: 'Workout - SendLove.io'
+    title: 'Workout - SendLove.io',
+    latitude: 123,
+    longitude: 456
   });
 };
 
@@ -154,8 +159,7 @@ exports.getWorkout = (req, res) => {
 */
 exports.postWorkout = (req, res, next) => {
   req.assert('name', 'Please include a name').notEmpty();
-  req.assert('latitude', 'Please include a latitude').notEmpty();
-  req.assert('longitude', 'Please include a longitude').notEmpty();
+  req.assert('description', 'Please include a description').notEmpty();
   
   const errors = req.validationErrors();
 
@@ -170,13 +174,17 @@ exports.postWorkout = (req, res, next) => {
   var formData = {
     name: req.body.name,
     description: req.body.description,
-    personId: req.body.personId,
+    personId: req.user._id,
     latitude: Number(req.body.latitude),
     longitude: Number(req.body.longitude)
   }
   
   var jsonData = JSON.stringify(formData); // "{  \"name\": \"hello, world!\",  \"description\": \"first workout\",  \"personId\": \"57bc9f71cf9c78642abfe952\",  \"latitude\": 33,  \"longitude\": 112, \"image\": \"sendlove.io/images/my_workout.jpg\", \"category\": \"running\", \"altId\": \"0\"}" // JSON.stringify(formData);  
-  
+
+  console.log(formData)
+  console.log(jsonData)
+  console.log(postUrl)
+      
   request({
     url: postUrl,
     method: "POST",
@@ -189,9 +197,7 @@ exports.postWorkout = (req, res, next) => {
     ,(err, request, body) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
-      console.log(formData)
-      console.log(jsonData)
-      console.log(postUrl)
+
       if (request.statusCode !== 201 && request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         return res.redirect('/api/workout');
