@@ -182,7 +182,6 @@ exports.postWorkout = (req, res, next) => {
   var jsonData = JSON.stringify(formData); // "{  \"name\": \"hello, world!\",  \"description\": \"first workout\",  \"personId\": \"57bc9f71cf9c78642abfe952\",  \"latitude\": 33,  \"longitude\": 112, \"image\": \"sendlove.io/images/my_workout.jpg\", \"category\": \"running\", \"altId\": \"0\"}" // JSON.stringify(formData);  
 
   console.log(formData)
-  console.log(jsonData)
   console.log(postUrl)
       
   request({
@@ -198,7 +197,7 @@ exports.postWorkout = (req, res, next) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
 
-      if (request.statusCode !== 201 && request.statusCode !==200) {
+      if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         return res.redirect('/api/workout');
       }

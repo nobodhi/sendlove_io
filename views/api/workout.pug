@@ -17,7 +17,16 @@ block content
   br
   p <a href="/api/workout"><b>Intention</b></a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> > <a href="/api/map">Map</a> 
 
-  h1(id="derp")=locals.longitude
+  br
+  .row
+    .col-sm-6
+      .form-group
+        label.control-label Map it!
+        #map(style="width:600px;height:400px") 
+        br
+        #floating-panel
+          input(id="address" type="textbox" placeholder="Search Box", autofocus)
+          input(id="submit" type="button" value="locate!")
 
   .row
     .col-sm-6
@@ -25,17 +34,11 @@ block content
         input(type='hidden', name='_csrf', value=_csrf)
         input(type='hidden', id='latitude', name='latitude', value=locals.latitude)
         input(type='hidden', id='longitude', name='longitude', value=locals.longitude)
-        br
-        .form-group
-          label.control-label Put it on the map!
-          #map(style="width:600px;height:400px") 
-          #floating-panel
-            input(id="address" type="textbox" placeholder="Search Box")
-            input(id="submit" type="button" value="Find me!")
+
         .form-group
           .input-group
             label.control-label Name 
-            input.form-control(name='name', autofocus, type='text', size='20', placeholder='Give it a cool name')
+            input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name')
         .form-group
           .input-group
             label.control-label Description
@@ -55,7 +58,7 @@ block content
               | Send
 
 
-  script(src='/js/testmap.js')
+  script(src='/js/workout.js')
   script( async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFYFYds1GEVZ0k_Ob6SzZg76vDVLqP9kc&callback=initMap')
 
   style.
@@ -66,7 +69,7 @@ block content
       position: absolute;
       top: 10px;
       left: 25%;
-      z-index: 5;
+      z-index: 5; 
       background-color: #fff;
       padding: 5px;
       border: 1px solid #999;

@@ -1,0 +1,28 @@
+<!-- Learn about this code on MDN: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener -->
+
+
+<form action="workout.html" method="get" >
+<input type="text" id="t1" name="t1" value="one">
+<br/>
+<input type="text" id="t2" name="t2" value="two">
+<br/>
+
+  <input type="hidden" name="a" value="1" /> 
+  <input type="hidden" name="b" value="2" /> 
+
+<input type="submit" id="foo">
+</form>
+
+<script>
+
+// Function to change the content of a DOM element
+function modifyText() {
+  alert(document.getElementById("t1").value); // Alert before change
+  document.getElementById("t1").value = "herp de derp";
+  alert(document.getElementById("t1").value); // Alert after change
+}
+// add event listener that calls mondifyText
+var el = document.getElementById("foo");
+el.addEventListener("click", modifyText, false);
+
+</script>
