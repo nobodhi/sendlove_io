@@ -57,13 +57,8 @@ block content
               i.fa.fa-location-arrow
               | Send
 
-  //- in development append a pseudo version number so that the javascript always reloads.
-  //- otherwise do this:
-  //- script(scr='/js/workout.js')
-  script.
-    document.write("<script type='text/javascript' src='/js/workout.js?" + Date.now() + "'><\/script>");
-  
-  script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')
+  script(src='/js/workout.js')
+  script( async defer src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBFYFYds1GEVZ0k_Ob6SzZg76vDVLqP9kc&libraries=visualization&callback=initMap')
 
   style.
     #map {

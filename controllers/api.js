@@ -36,21 +36,73 @@ exports.getApi = (req, res) => {
 };
 
 
+/*
+  GET /api/testmap
+  this is the dynamic version
+*/
+exports.getTestMap = (req, res, next) => {
+  const getUrl = process.env.API_URL + '/thing';
+  var latitude; 
+  var longitude;
+  var mapKey;
+  var mapLocations;
+
+  request({
+    url: getUrl,
+    method: "GET",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    }
+    }
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+
+      if (request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        return res.redirect('/api/testmap');
+      }
+      mapLocations = request.body; // NB: this is how to query the sendlove.io api
+      req.flash('success', { msg: 'results received' });
+      res.render('api/testmap', {
+        title: 'testmap - SendLove.io',
+        latitude,
+        longitude,
+        mapKey: process.env.GOOGLE_MAPS_KEY,
+        mapLocations: mapLocations
+      });
+    }
+  );
+
+}
+
 
 /*
   GET /api/testmap
   display the testmap 
 */
-exports.getTestMap = (req, res) => {
-  var latitude; 
-  var longitude;
-  res.render('api/testmap', {
-    title: 'testmap - SendLove.io',
-    latitude,
-    longitude
-  });
-  
-};
+// exports.getTestMap = (req, res) => {
+//   const getUrl = process.env.API_URL + '/thing';
+//   var latitude; 
+//   var longitude;
+//   var mapKey;
+//   var mapLocations;
+//   res.render('api/testmap', {
+//     title: 'testmap - SendLove.io',
+//     latitude,
+//     longitude,
+//     mapKey: process.env.GOOGLE_MAPS_KEY,
+//     mapLocations
+//   });
+// };
+// 
+
+
+
+
+
+
 
 /*
   POST /api/testmap
@@ -62,16 +114,17 @@ exports.postTestMap = (req, res) => {
 };
 
 
+
 /*
   GET /api/map
   display the map 
 */
-exports.getMap = (req, res) => {
-  res.render('api/map', {
-    title: 'World Wide Map of Intentions - SendLove.io'
-  });
-};
-
+ exports.getMap = (req, res) => {
+   res.render('api/map', {
+     title: 'World Wide Map of Intentions - SendLove.io'
+   });
+ };
+ 
 /*
   POST /api/map
   Choose a workout from the map
@@ -145,10 +198,13 @@ exports.postRecipient = (req, res) => {
   Retrieve user's workouts from api.sendlove.io and return them to the user
 */
 exports.getWorkout = (req, res) => {
+  var latitude;
+  var longitude;
   res.render('api/workout', {
     title: 'Workout - SendLove.io',
-    latitude: 123,
-    longitude: 456
+    latitude,
+    longitude,
+    mapKey: process.env.GOOGLE_MAPS_KEY    
   });
 };
 
@@ -437,7 +493,7 @@ exports.getNewYorkTimes = (req, res, next) => {
     if (request.statusCode === 403) {
       return next(new Error('Invalid New York Times API Key'));
     }
-    const books = JSON.parse(body).results;
+    const books = JSON.parse(body).results; 
     res.render('api/nyt', {
       title: 'New York Times API',
       books

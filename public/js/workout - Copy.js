@@ -4,7 +4,7 @@ var markers = [];
 function initMap() {
   
   var map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 36.0907578, lng: -119.5948303 }, // TODO make starting point based on user's location
+    center: { lat: 36.0907578, lng: -119.5948303 },
     zoom: 4
   });
   deleteMarkers();
@@ -17,10 +17,10 @@ function initMap() {
     geocodeAddress(geocoder, map);
   });
 
-  // press enter
+  // press enter -- doesn't work properly in pug.
   document.getElementById('address').addEventListener('keypress', function(e) {
     var key = e.which || e.keyCode;
-    if (key === 13) { 
+    if (key === 13) { // 13 is enter
       deleteMarkers();
       geocodeAddress(geocoder, map);
     }
@@ -45,7 +45,6 @@ function initMap() {
   
 }
 
-// Sets a marker from a street address. 
 function geocodeAddress(geocoder, resultsMap) {
   var address = document.getElementById('address').value;
   geocoder.geocode({'address': address}, function(results, status) {
@@ -83,7 +82,6 @@ function geocodeAddress(geocoder, resultsMap) {
  
 }
 
-// set hidden field inputs
 function modifyInputs() {
   var latitudeInput = document.getElementById("latitude");
   var longitudeInput = document.getElementById("longitude");
