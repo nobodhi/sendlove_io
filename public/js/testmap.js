@@ -1,22 +1,85 @@
 
 var map, heatmap;
-
+// leaflet? 
 
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 4, // 13 is close
-    center: {lat: 47.614262, lng: -122.323794}, // seattle
+    zoom: 10, // 13 is close
+    center: {lat: 47.614262, lng: -122.323794}, // seattle. TODO: center on user's location or on first object returned.
     // center: {lat: 37.775, lng: -122.434}, // SF
     mapTypeId: 'roadmap' // satellite terrain roadmap hybrid
   });
   // console.log( 'Lat: ' + latitude + ', lng:' + longitude);     
 
+//   // Try HTML5 geolocation. ONlY WORKS ON HTTPS
+//   if (navigator.geolocation) {
+//     navigator.geolocation.getCurrentPosition(function(position) {
+//       var pos = {
+//         lat: position.coords.latitude,
+//         lng: position.coords.longitude
+//       };
+// 
+//       infoWindow.setPosition(pos);
+//       infoWindow.setContent('Location found.');
+//       map.setCenter(pos);
+//     }, function() {
+//       handleLocationError(true, infoWindow, map.getCenter());
+//     });
+//   } else {
+//     // Browser doesn't support Geolocation
+//     handleLocationError(false, infoWindow, map.getCenter());
+//   }
+// 
+  
+  
   heatmap = new google.maps.visualization.HeatmapLayer({
-    data: getPoints(),
+    data: getPoints(),  // uses locals.locations
     map: map
   });
-  //alert("hello " + locations[0].name)
-}
+  
+  // use locals.locations to drop markers
+  
+  // NB: this same function is repeated in workout.js:
+  locations.forEach(function(loc) {
+    var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(loc.latitude, loc.longitude),
+      icon: {
+        url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAjCAIAAABpW9/5AAAABnRSTlMAAAAAAABupgeRAAAACXBIWXMAARxbAAEcWwEUN6FaAAACMElEQVRYw8XXS0hVURTG8d89V4uiMEWwib0GlgVqYGJlgyQsKsJJkyCoYeYsgwZBRYMG2aShCRHUrBcR5UAIkuhB5ZN0koNASCsqDEsra2DJTb2Pc1PvNzrsvdb+7732Y60T8a8iVLGXMpaDt3RwjzbGJdEaaiijgIBBurjP62mWkSluZymNM2gfZ+iO01vIcarj9LZyjsGYlujkVyXNFMZfTT61vKN3WtcOmihKGIl9vIxh/wEXc4nFySIZsJ0hXsU07uE8C5L5LmInD/kwGeqF3GCVVPWDw7SDEq6QnbJvP/sZnVjxQXYLoYByrpNFM3lhfHP5QgfRKI0sEU45DFPKLqFVxFWyKiiQjg4RpOWYz2aytkpT+dLXFoL1MqANBCsyAS4kyMsEOJcgOxPgLIJvmQB/JRjIBPgNQXsmwC8IWjIBvkvwjJ75pT6mayJJ9FGb7vsXViPU83kCPMQw2+ae+pMGOmMLgW7GqZhL6ndO0Dq99HnOIFWxTbOn99TTNmPNhV4eUc6yWaU+oG5aoTl1eUPcJJuS2ThuHznNRUYSl7exWstJNqaL/MVtLvApjkEkcW1VyzFyQlIHOMWThDbRxLPu5Q4rWZ0ytYU6+pOZRVO58i0MU5ls18dppJGxFOaX6t3popPq+IX7KA3cSjkwkVCbV0wTuTPl13qehhkqEva4ruMyS2NaxjgSkpqmNtFODz10UzOfqe3AX/DRec7kEZq4NjcPe/JfoNL/cP8N53lwp5gXjtsAAAAASUVORK5CYII=',
+        scaledSize: new google.maps.Size(10, 8),
+      },
+      map: map,
+      title: loc.location,
+      targetUrl: loc.targetUrl,
+      animation: google.maps.Animation.DROP,
+      draggable: false
+    });
+
+    window.google.maps.event.addListener(marker, 'click', function() {
+        window.location.href =  marker.targetUrl;
+    });
+
+  });  
+  
+
+  // testing recenter
+  //   var pos = {
+  //     lat: locations[0].latitude,
+  //     lng: locations[0].longitude
+  //   };  
+  // map.setCenter(pos);
+  // map.setZoom(4);
+  
+  // if there are not very many markers, make them bigger:
+  
+  if (locations.length < 1000) {
+    changeOpacity() ;
+    changeGradient() ;
+    changeRadius() ;
+  }
+
+
+} // initMap
+
 
 function toggleHeatmap() {
   heatmap.setMap(heatmap.getMap() ? null : map);
@@ -24,7 +87,7 @@ function toggleHeatmap() {
 
 function changeGradient() {
   var gradient = [
-    'rgba(0, 255, 255, 0)',
+    'rgba(0, 0, 0, 0)',
     'rgba(0, 255, 255, 1)',
     'rgba(0, 191, 255, 1)',
     'rgba(0, 127, 255, 1)',
@@ -47,22 +110,31 @@ function changeRadius() {
 }
 
 function changeOpacity() {
-  heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+  heatmap.set('opacity', heatmap.get('opacity') ? null :  10 );
 }
 
-// new Heatmap: read from database
+// use locals.locations to create heatmap's 'data' array
 function getPoints() {
-  var foo=[];
+  var mapPoints=[];
+  var weight=1;
   for (var i in locations){
-    if (locations.hasOwnProperty(i)) {
-      console.log("name: " + locations[i].name + ", lat: " + locations[i].latitude + ", lng: " + locations[i].longitude);
-      // add an object
-      foo.push( new google.maps.LatLng(locations[i].latitude, locations[i].longitude));
-    }
+    if (locations.hasOwnProperty(i)) { // ensures that the object exists
+
+      // TODO if there are not many markers nearby, increase weight accordingly
+      mapPoints.push( {location: new google.maps.LatLng(locations[i].latitude, locations[i].longitude), weight:weight} );
+      // console.log("name: " + locations[i].name + ", lat: " + locations[i].latitude + ", lng: " + locations[i].longitude);
+     }
   }
-  return foo;
+  return mapPoints;
 }
 
+
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  if (!browserHasGeolocation) {
+    console.log('geolocation error');
+  }
+}
 
 
 // Heatmap data: 500 Points

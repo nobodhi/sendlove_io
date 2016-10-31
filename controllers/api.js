@@ -64,7 +64,7 @@ exports.getTestMap = (req, res, next) => {
         return res.redirect('/api/testmap');
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
-      req.flash('success', { msg: 'results received' });
+      // req.flash('success', { msg: 'results received' });
       res.render('api/testmap', {
         title: 'testmap - SendLove.io',
         latitude,
