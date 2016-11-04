@@ -189,7 +189,7 @@ exports.getIntention = (req, res) => {
 
       if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        return res.redirect('/api/testmap');
+        return res.redirect('/api/intention');
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
       title = request.body.name;
