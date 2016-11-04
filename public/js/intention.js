@@ -52,7 +52,7 @@ function initMap() {
   },
   map: map,
   title: locations.name,
-  targetUrl: '/api/workout/' + locations._id.toString(),
+  targetUrl: '/api/intention/' + locations._id.toString(),
   animation: google.maps.Animation.DROP,
   draggable: false
   });

@@ -15,7 +15,9 @@ block content
       | How does it work?
 
   br
-  p <a href="/api/workout">Intention</a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message"><b>Message</b></a> > <a href="/api/map">Map</a> 
+  p <a href="/api/intention/#{token}">Intention</a> > <a href="/api/message?intention=#{token}"><b>Message</b></a> > <a href="/api/map">Map</a> 
+ 
+  //- p=token
   
   .row
     .col-sm-6
@@ -23,6 +25,7 @@ block content
         br
         input(type='hidden', name='_csrf', value=_csrf)
         input(type='hidden', name='personId', value=user.id) 
+        input(type='hidden', name='token', value=token) 
         
         .form-group
           .input-group

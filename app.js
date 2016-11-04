@@ -17,7 +17,7 @@ const passport = require('passport');
 const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const uploadMulter = multer({ dest: path.join(__dirname, 'uploads') });
 
 /*
   Load environment variables from .env file, where API keys and passwords are configured.
@@ -62,6 +62,10 @@ app.use(sass({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public')
 }));
+app.use("/uploads", express.static(__dirname + '/uploads'));
+
+
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -79,7 +83,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload') {
+  if (req.path === '/api/upload' || req.path === '/api/new_intention') { // KLUDGE: CSRF multipart issue.
     next();
   } else {
     lusca.csrf()(req, res, next);
@@ -114,6 +118,7 @@ app.get('/privacy', function (req, res) {
   res.render('privacy', { title: 'Privacy Policy'});
 });
 
+// APP routes call the API functions by name.
 
 app.get('/', homeController.index);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
@@ -163,11 +168,12 @@ app.get('/api/tumblr', passportConfig.isAuthenticated, passportConfig.isAuthoriz
 app.get('/api/twilio', apiController.getTwilio);
 app.get('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getTwitter);
 app.get('/api/upload', apiController.getFileUpload);
-app.get('/api/workout', passportConfig.isAuthenticated, apiController.getWorkout); 
+app.get('/api/new_intention', passportConfig.isAuthenticated, apiController.getNewIntention); 
+app.get('/api/intention/:token', apiController.getIntention); 
 app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage); 
 app.get('/api/recipient', passportConfig.isAuthenticated, apiController.getRecipient); 
 app.get('/api/map', apiController.getMap); 
-app.get('/api/testmap', apiController.getTestMap); // optional login? checks if user.id exists
+app.get('/api/testmap', apiController.getTestMap); 
 
 /*
   API Post Routes
@@ -178,8 +184,9 @@ app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuth
 app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe);
 app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
 app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
-app.post('/api/upload', passportConfig.isAuthenticated, upload.single('myFile'), apiController.postFileUpload);
-app.post('/api/workout', passportConfig.isAuthenticated, apiController.postWorkout);
+app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postFileUpload); // imgur vs upload
+app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
+app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?
 app.post('/api/recipient', passportConfig.isAuthenticated, apiController.postRecipient);
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
 app.post('/api/testmap', apiController.postTestMap); // optional login? checks if user.id exists

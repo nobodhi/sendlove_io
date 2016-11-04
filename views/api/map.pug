@@ -3,8 +3,7 @@ extends ../layout
 block content
   style.
     #map {
-      width: 100%;
-      height: 500px;
+      height: 60vh;
     }
 
   .page-header
@@ -21,10 +20,15 @@ block content
       | How does it work?
 
   br
-  p <a href="/api/workout">Intention</a> > <a href="/api/recipient">Recipient</a> > <a href="/api/message">Message</a> > <a href="/api/map"><b>Map</b></a> 
+  p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a> 
 
   #map
 
-  script(src='/js/map.js')
-  script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBOukJlvI_qFJMUpeol0u-SOtRlySx_4DE&callback=initMap')
- 
+  //- this is the simple way of making a local available to client javascript.
+  script(type='text/javascript').
+    var locations =!{JSON.stringify(mapLocations)}
+    
+  script.
+    document.write("<script type='text/javascript' var locations=locals.mapLocations src='/js/map.js?" + Date.now() + "'><\/script>");
+  
+  script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')

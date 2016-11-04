@@ -1,4 +1,5 @@
 'use strict';
+const util = require('util');
 const _ = require('lodash');
 const async = require('async');
 const validator = require('validator');
@@ -24,6 +25,14 @@ const foursquare = require('node-foursquare')({
   }
 });
 
+// var cloudinary = require('cloudinary');
+// cloudinary.config({ 
+//   cloud_name: process.env.CLOUDINARY_NAME, 
+//   api_key: process.env.CLOUDINARY_KEY, 
+//   api_secret: process.env.CLOUDINARY_SECRET 
+// });
+
+// APP routes call the API functions by name.
 
 /*
   GET /api
@@ -34,6 +43,183 @@ exports.getApi = (req, res) => {
     title: 'API Examples'
   });
 };
+
+
+/*
+  GET /api/upload
+  File Upload API example.
+*/
+ 
+exports.getFileUpload = (req, res, next) => {
+
+  // var cloudinary_cors = "http://" + req.headers.host + "/html/cloudinary_cors.html";
+  // var image_upload_tag = cloudinary.uploader.image_upload_tag('imagePath', { callback: cloudinary_cors });
+  
+  res.render('api/upload', {
+    title: 'File Upload'
+    // image_upload_tag: image_upload_tag
+  });
+};
+
+exports.postFileUpload = (req, res, next) => {
+  req.flash('success', { msg: 'File was uploaded successfully.' });
+  res.redirect('/api/upload');
+};
+
+
+
+
+
+/*
+  GET /api/new_intention
+  for posting a new intention
+*/
+exports.getNewIntention = (req, res) => {
+  var latitude;
+  var longitude;
+
+  //var cloudinary_cors = "http://" + req.headers.host + "/html/cloudinary_cors.html";
+  //var image_upload_tag = cloudinary.uploader.image_upload_tag('imagePath', { callback: cloudinary_cors }); 
+  //cloudinary.cloudinary_js_config();
+
+  res.render('api/new_intention', {
+    title: 'Intention - SendLove.io',
+    latitude,
+    longitude,
+    mapKey: process.env.GOOGLE_MAPS_KEY
+    //cloudinary_cors: cloudinary_cors,
+    //image_upload_tag: image_upload_tag
+  });
+}
+
+/*
+  POST /api/new_intention
+  Create a new intention on api.sendlove.io and return it to the user
+
+*/
+exports.postIntention = (req, res, next) => {
+  const fs = require('fs');
+  
+  // check errors
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/api/new_intention');
+  }
+  
+  // check image file type
+  const readChunk = require('read-chunk'); // npm install read-chunk 
+  const fileType = require('file-type');
+  var newImage = req.file.filename;
+  const buffer = readChunk.sync('uploads/'+newImage, 0, 262);
+  var newExt = fileType(buffer);
+
+  // delete bad file or rename good file. KLUDGE.
+  const allowedImages = ['gif', 'jpg', 'png'];
+  if (allowedImages.indexOf(newExt.ext.toLowerCase()) > -1) {
+    newImage += "." + newExt.ext;
+    fs.renameSync("uploads/"+req.file.filename, "uploads/"+newImage); // TODO: try to map this with the uploads variable set in app.js
+  } else {
+    fs.unlinkSync('uploads/'+newImage); // TODO make asynchronous?
+    req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
+    return res.redirect('/api/new_intention');
+  }
+
+  
+  // set API post url, and process form
+  const postUrl = process.env.API_URL + '/thing'
+  var formData = {
+    name: req.body.name,
+    description: req.body.description,
+    personId: req.user._id,
+    latitude: Number(req.body.latitude),
+    longitude: Number(req.body.longitude),
+    imagePath: newImage,
+    category: req.body.category
+  }
+  var jsonData = JSON.stringify(formData); // "{  \"name\": \"hello, world!\",  \"description\": \"first intention\",  \"personId\": \"57bc9f71cf9c78642abfe952\",  \"latitude\": 33,  \"longitude\": 112, \"image\": \"sendlove.io/images/my_intention.jpg\", \"category\": \"running\", \"altId\": \"0\"}" 
+  console.log(formData);
+  request({
+    url: postUrl,
+    method: "POST",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: jsonData
+    }
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+      if (request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        return res.redirect('/api/new_intention');
+      }
+      req.flash('success', { msg: 'Intention created!' });
+      res.redirect('/api/intention/' + request.body._id);
+    }
+  );
+}
+
+/*
+  GET /api/intention/:id
+  Retrieve a single intention
+*/
+exports.getIntention = (req, res) => {
+  const getUrl = process.env.API_URL + '/thing/' + req.params.token;
+  var latitude; 
+  var longitude;
+  var mapKey;
+  var mapLocations;
+  var title;
+  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
+  var shareUrl = "http://" + req.hostname + '/api/intention/' + req.params.token;
+
+  request({
+    url: getUrl,
+    method: "GET",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    }
+    }
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+
+      if (request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        return res.redirect('/api/testmap');
+      }
+      mapLocations = request.body; // NB: this is how to query the sendlove.io api
+      title = request.body.name;
+      imagePath += request.body.imagePath;
+      latitude = request.body.latitude;
+      longitude = request.body.longitude;
+      res.render('api/intention' , {
+        title: title,
+        description: request.body.description,
+        latitude: latitude,
+        longitude: longitude,
+        mapKey: process.env.GOOGLE_MAPS_KEY,
+        mapLocations: mapLocations,
+        imagePath: imagePath,
+        token: req.params.token,
+        shareUrl: shareUrl
+      });
+    }
+  );
+}
+
+// intention end point no longer supported
+// 
+//   res.render('api/intention', {
+//     title: 'Intention - SendLove.io',
+//     latitude,
+//     longitude,
+//     mapKey: process.env.GOOGLE_MAPS_KEY,
+//     token: token
+
 
 
 /*
@@ -67,6 +253,7 @@ exports.getTestMap = (req, res, next) => {
       // req.flash('success', { msg: 'results received' });
       res.render('api/testmap', {
         title: 'testmap - SendLove.io',
+        description: 'SendLove I/O Worldwide Map of Intentions! Set your intention today on SendLove.io.',
         latitude,
         longitude,
         mapKey: process.env.GOOGLE_MAPS_KEY,
@@ -74,39 +261,14 @@ exports.getTestMap = (req, res, next) => {
       });
     }
   );
-
 }
-
-
-/*
-  GET /api/testmap
-  display the testmap 
-*/
-// exports.getTestMap = (req, res) => {
-//   const getUrl = process.env.API_URL + '/thing';
-//   var latitude; 
-//   var longitude;
-//   var mapKey;
-//   var mapLocations;
-//   res.render('api/testmap', {
-//     title: 'testmap - SendLove.io',
-//     latitude,
-//     longitude,
-//     mapKey: process.env.GOOGLE_MAPS_KEY,
-//     mapLocations
-//   });
-// };
-// 
-
-
-
 
 
 
 
 /*
   POST /api/testmap
-  Choose a workout from the map
+  Choose a intention from the map
 
 */
 exports.postTestMap = (req, res) => {
@@ -119,19 +281,53 @@ exports.postTestMap = (req, res) => {
   GET /api/map
   display the map 
 */
- exports.getMap = (req, res) => {
-   res.render('api/map', {
-     title: 'World Wide Map of Intentions - SendLove.io'
-   });
- };
+ exports.getMap = (req, res, next) => {
  
+  const getUrl = process.env.API_URL + '/thing';
+  var latitude; 
+  var longitude;
+  var mapKey;
+  var mapLocations;
+
+  request({
+    url: getUrl,
+    method: "GET",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    }
+    }
+
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+      
+      if (request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        return res.redirect('/api/map');
+      }
+      mapLocations = request.body; // NB: this is how to query the sendlove.io api
+      // req.flash('success', { msg: 'results received' });
+
+      res.render('api/map', {
+        title: 'World Wide Map of Intentions - SendLove.io',
+        description: 'SendLove I/O Worldwide Map of Intentions! Set your intention today on SendLove.io.',
+        latitude,
+        longitude,
+        mapKey: process.env.GOOGLE_MAPS_KEY,
+        mapLocations: mapLocations     
+      });
+    }
+  );
+}
+
 /*
   POST /api/map
-  Choose a workout from the map
+  Choose a intention from the map
 
 */
 exports.postMap = (req, res) => {
-  res.redirect('/api/workout');
+  res.redirect('/api/new_intention');
 };
 
 /*
@@ -140,9 +336,10 @@ exports.postMap = (req, res) => {
 */
 exports.getMessage = (req, res) => {
   res.render('api/message', {
-    title: 'Message - SendLove.io'
+    title: 'Message - SendLove.io',
+    token: req.param('intention')
   });
-};
+}
 
 /*
   POST /api/message
@@ -152,18 +349,18 @@ exports.getMessage = (req, res) => {
 exports.postMessage = (req, res, next) => {
   req.assert('telephone', 'Phone number is required.').notEmpty();
   req.assert('message', 'Message cannot be blank.').notEmpty();
-
   const errors = req.validationErrors();
-
   if (errors) {
     req.flash('errors', errors);
     return res.redirect('/api/message');
   }
+  const token =req.body.token;
+  var shareUrl = "http://" + req.hostname + '/api/intention/' + token; // TODO dynamically determine protocol, parameterize folder
 
   const message = {
     to: req.body.telephone,
-    from: '+16233350027',
-    body: req.body.message + " - sent via SendLove.io"
+    from: '+16233350027', // TODO - set in environment variables
+    body: req.body.message + " - " + shareUrl
   };
   
   twilio.sendMessage(message, (err, responseData) => {
@@ -171,96 +368,25 @@ exports.postMessage = (req, res, next) => {
     req.flash('success', { msg: `Text sent to ${responseData.to}.` });
     res.redirect('/api/message');
   });
-};
+}
 
 /*
   GET /api/recipient
-  add a recipient to a workout
+  add a recipient to a intention
 */
 exports.getRecipient = (req, res) => {
   res.render('api/recipient', {
     title: 'Recipient - SendLove.io'
   });
-};
+}
 
 /*
   POST /api/recipient
-  Add a new recipient on api.sendlove.io
+  Add a new recipient 
 
 */
 exports.postRecipient = (req, res) => {
   res.redirect('/api/message');
-};
-
-
-/*
-  GET /api/workout
-  Retrieve user's workouts from api.sendlove.io and return them to the user
-*/
-exports.getWorkout = (req, res) => {
-  var latitude;
-  var longitude;
-  res.render('api/workout', {
-    title: 'Workout - SendLove.io',
-    latitude,
-    longitude,
-    mapKey: process.env.GOOGLE_MAPS_KEY    
-  });
-};
-
-/*
-  POST /api/workout
-  Create a new workout on api.sendlove.io and return it to the user
-
-*/
-exports.postWorkout = (req, res, next) => {
-  req.assert('name', 'Please include a name').notEmpty();
-  req.assert('description', 'Please include a description').notEmpty();
-  
-  const errors = req.validationErrors();
-
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/api/workout');
-  }
-  
-  const postUrl = process.env.API_URL + '/thing'
-
-  //const formData = req.body;
-  var formData = {
-    name: req.body.name,
-    description: req.body.description,
-    personId: req.user._id,
-    latitude: Number(req.body.latitude),
-    longitude: Number(req.body.longitude)
-  }
-  
-  var jsonData = JSON.stringify(formData); // "{  \"name\": \"hello, world!\",  \"description\": \"first workout\",  \"personId\": \"57bc9f71cf9c78642abfe952\",  \"latitude\": 33,  \"longitude\": 112, \"image\": \"sendlove.io/images/my_workout.jpg\", \"category\": \"running\", \"altId\": \"0\"}" // JSON.stringify(formData);  
-
-  console.log(formData)
-  console.log(postUrl)
-      
-  request({
-    url: postUrl,
-    method: "POST",
-    json: true,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: jsonData
-    }
-    ,(err, request, body) => {
-      // `body` is a js object if request was successful
-      if (err) { return next(err); }
-
-      if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        return res.redirect('/api/workout');
-      }
-      req.flash('success', { msg: 'Workout created!' });
-      res.redirect('/api/recipient');
-    }
-  );
 }
 
 
@@ -894,21 +1020,6 @@ exports.getLob = (req, res, next) => {
   });
 };
 
-/*
-  GET /api/upload
-  File Upload API example.
-*/
- 
-exports.getFileUpload = (req, res, next) => {
-  res.render('api/upload', {
-    title: 'File Upload'
-  });
-};
-
-exports.postFileUpload = (req, res, next) => {
-  req.flash('success', { msg: 'File was uploaded successfully.' });
-  res.redirect('/api/upload');
-};
 
 /*
   GET /api/pinterest
