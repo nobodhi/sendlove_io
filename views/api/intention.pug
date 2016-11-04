@@ -32,16 +32,13 @@ block content
       h3=mapLocations.name
       img(class="img-thumbnail" title=mapLocations.name src=imagePath)
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
-      p=mapLocations.category
 
-
-
- 
   br
   .row
     .col-sm-6
       #map
 
+  p=mapLocations.category
 
   
   //- this is the simple way of making a local available to client javascript.

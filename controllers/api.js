@@ -199,6 +199,7 @@ exports.getIntention = (req, res) => {
       res.render('api/intention' , {
         title: title,
         description: request.body.description,
+        shortDescription: request.body.description.substring(1,150) + "..",
         latitude: latitude,
         longitude: longitude,
         mapKey: process.env.GOOGLE_MAPS_KEY,
