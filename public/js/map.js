@@ -36,8 +36,6 @@ function initMap() {
     map: map
   });
   
-  // use locals.locations to drop markers
-  
   // NB: this same function is repeated in intention.js:
   locations.forEach(function(loc) {
     var marker = new google.maps.Marker({

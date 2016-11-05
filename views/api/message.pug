@@ -3,19 +3,20 @@ extends ../layout
 block content
   .page-header
     h2
-      i.fa.fa-mobile-phone
+      a(href='/api/map')
+        i.fa.fa-mobile-phone
       | Message - SendLove.io
 
   .btn-group.btn-group-justified
+    a.btn.btn-primary(href='/api/new_intention')
+      i.fa.fa-heart-o 
+      | Create your intention
     a.btn.btn-primary(href='https://www.facebook.com/sendlove.io', target='_blank')
       i.fa.fa-share
-      | Share your intention!
-    a.btn.btn-primary(href='/', target='_blank')
-      i.fa.fa-question-circle-o 
-      | How does it work?
+      | Share your intention
 
   br
-  p <a href="/api/intention/=#{token}">Intention</a> > <a href="/api/message?intention=#{token}"><b>Message</b></a> > <a href="/api/map">Map</a> 
+  p <a href="/api/intention/#{token}">Intention</a> > <a href="/api/message?intention=#{token}"><b>Message</b></a> > <a href="/api/map">Map</a> 
  
   //- p=token
   

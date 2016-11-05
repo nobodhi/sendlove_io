@@ -8,21 +8,40 @@ block content
 
   .page-header
     h2
-      i.fa.fa-map
+      a(href='/api/map')
+        i.fa.fa-map
       | Map - Sendlove.io
 
   .btn-group.btn-group-justified
-    a.btn.btn-primary(href='https://www.facebook.com/sendlove.io', target='_blank')
+    a.btn.btn-primary(href='/api/new_intention')
+      i.fa.fa-heart-o 
+      | Create your intention
+    a.btn.btn-primary(href='http://www.facebook.com/sharer/sharer.php?u='+shareUrl, target='_blank')
       i.fa.fa-share
-      | Share your intention!
-    a.btn.btn-primary(href='/', target='_blank')
-      i.fa.fa-question-circle-o 
-      | How does it work?
+      | Share your intention
 
   br
   p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a> 
 
   #map
+
+   br
+  .row
+    .col-sm-6
+      br
+      table(border=0)
+        thead
+        tbody
+          for result in mapLocations.reverse()
+            tr
+            td(padding=1)
+              img(src='/uploads/'+result.imagePath, height="50px")  
+            td
+              a(href='/api/intention/' + result._id ) #{result.name}
+            td
+              a(href='/api/intention/' + result._id ) #{result.category}
+
+
 
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').

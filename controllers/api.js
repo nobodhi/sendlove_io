@@ -78,9 +78,6 @@ exports.getNewIntention = (req, res) => {
   var latitude;
   var longitude;
 
-  //var cloudinary_cors = "http://" + req.headers.host + "/html/cloudinary_cors.html";
-  //var image_upload_tag = cloudinary.uploader.image_upload_tag('imagePath', { callback: cloudinary_cors }); 
-  //cloudinary.cloudinary_js_config();
 
   res.render('api/new_intention', {
     title: 'Intention - SendLove.io',
@@ -289,6 +286,8 @@ exports.postTestMap = (req, res) => {
   var longitude;
   var mapKey;
   var mapLocations;
+  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
+  var shareUrl = "http://" + req.hostname + '/api/map/' 
 
   request({
     url: getUrl,
@@ -310,13 +309,20 @@ exports.postTestMap = (req, res) => {
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
       // req.flash('success', { msg: 'results received' });
 
+      if (mapLocations.length > 0) {
+        imagePath += mapLocations[mapLocations.length-1].imagePath; // TODO: curated image for map page
+      }
+      
       res.render('api/map', {
-        title: 'World Wide Map of Intentions - SendLove.io',
-        description: 'SendLove I/O Worldwide Map of Intentions! Set your intention today on SendLove.io.',
+        title: 'SendLove.io',
+        description: 'Set your intention today on SendLove.io.',
+        shortDescription: 'Set your intention today on SendLove.io.',       
         latitude,
         longitude,
         mapKey: process.env.GOOGLE_MAPS_KEY,
-        mapLocations: mapLocations     
+        mapLocations: mapLocations,
+        imagePath: imagePath,
+        shareUrl: shareUrl
       });
     }
   );
