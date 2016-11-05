@@ -29,12 +29,12 @@ block content
   .row
     .col-sm-6
       br
-      table(border=0)
+      table(border=0 width="100%" )
         thead
         tbody
           for result in mapLocations.reverse()
             tr
-            td(padding=1)
+            td
               img(src='/uploads/'+result.imagePath, height="50px")  
             td
               a(href='/api/intention/' + result._id ) #{result.name}
