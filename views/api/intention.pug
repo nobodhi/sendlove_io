@@ -28,7 +28,7 @@ block content
     p <a href="/api/intention/#{token}"><b>Intention</b></a> > <a href="/api/map">Map</a> 
   br
   //- p=shareUrl
-  
+
   br
   .row
     .col-sm-6  
@@ -37,13 +37,14 @@ block content
       img(class="img-thumbnail" title=mapLocations.name src=imagePath)
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
 
+  
   br
   .row
     .col-sm-6
       #map
 
-      p
-      a(href='/api/map/'  ) #{mapLocations.category}
+  p
+  a(href='/api/map/'  ) #{mapLocations.category}
 
   
   //- this is the simple way of making a local available to client javascript.

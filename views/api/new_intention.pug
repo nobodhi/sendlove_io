@@ -2,6 +2,11 @@ extends ../layout
 
 
 block content
+  style.
+    #map {
+      height: 50vh;
+     
+    }
   .page-header
     h2
       a(href='/api/map')
@@ -26,11 +31,12 @@ block content
     .col-sm-6
       .form-group
         label.control-label Map it!
-        #map(style="width:600px;height:400px") 
+        #map
         br
         #floating-panel
           input(id="address" type="textbox" placeholder="Search Box", autofocus)
           input(id="submit" type="button" value="map it!")
+
            
   .row
     .col-sm-6
@@ -39,10 +45,9 @@ block content
         input(type='hidden', id='latitude', name='latitude')
         input(type='hidden', id='longitude', name='longitude')
         input(type='hidden', id='imagePath', name='imagePath')
-        .form-group
-          .input-group
-            label.control-label Image
-            input(type='file', name='myFile')
+
+
+
         .form-group
           .input-group
             label.control-label Name 
@@ -51,6 +56,10 @@ block content
           .input-group
             label.control-label Description
             textarea.form-control(name='description',  cols='35', rows='3', placeholder='Give it a great description')
+        .form-group
+          .input-group
+            label.control-label Image
+            input(type='file', name='myFile')
         .form-group
           .input-group
             label.control-label Category
@@ -71,9 +80,6 @@ block content
   script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')
 
   style.
-    #map {
-      height: 100%;
-    }
     #floating-panel {
       position: absolute;
       top: 10px;
