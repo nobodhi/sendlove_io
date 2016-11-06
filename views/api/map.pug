@@ -29,7 +29,7 @@ block content
   .row
     .col-sm-6
       br
-      table(border=0 width="100%" )
+      table(border=0  )
         thead
         tbody
           for result in mapLocations.reverse()
@@ -38,6 +38,8 @@ block content
               img(src='/uploads/'+result.imagePath, height="50px")  
             td
               a(href='/api/intention/' + result._id ) #{result.name}
+            td
+              p #{result.description.substring(0,50)}
             td
               a(href='/api/intention/' + result._id ) #{result.category}
 
