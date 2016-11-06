@@ -28,7 +28,7 @@ block content
   
   br
   .row
-    .col-sm-6
+    .col-lg-8
       .form-group
         label.control-label Map it!
         #map
@@ -39,7 +39,7 @@ block content
 
            
   .row
-    .col-sm-6
+    .col-lg-8
       form(role='form', method='POST', enctype='multipart/form-data', onsubmit='modifyInputs();')
         input(type='hidden', name='_csrf', value=_csrf)
         input(type='hidden', id='latitude', name='latitude')
