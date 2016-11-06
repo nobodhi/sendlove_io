@@ -105,6 +105,10 @@ exports.postIntention = (req, res, next) => {
   }
   
   // check image file type
+  if (req.file == undefined) {
+    req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
+    return res.redirect('/api/new_intention');
+  }
   const readChunk = require('read-chunk'); // npm install read-chunk 
   const fileType = require('file-type');
   var newImage = req.file.filename;
