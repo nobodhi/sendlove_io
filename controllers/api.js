@@ -311,35 +311,29 @@ exports.postTestMap = (req, res) => {
         return res.redirect('/api/map');
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
-      // req.flash('success', { msg: 'results received' });
 
       if (mapLocations.length > 0) {
-        imagePath += mapLocations[mapLocations.length-1].imagePath; // TODO: curated image for map page
+        imagePath += mapLocations[mapLocations.length-1].imagePath; 
+      }
+      else {
+        imagePath += 'globe.gif';
       }
       
       res.render('api/map', {
         title: 'SendLove.io',
-        description: 'Set your intention today on SendLove.io.',
         shortDescription: 'Set your intention today on SendLove.io.',       
         latitude,
         longitude,
         mapKey: process.env.GOOGLE_MAPS_KEY,
         mapLocations: mapLocations,
-        imagePath: imagePath,
+        imagePath: imagePath, // + 'globe.gif',
         shareUrl: shareUrl
       });
     }
   );
 }
 
-/*
-  POST /api/map
-  Choose a intention from the map
 
-*/
-exports.postMap = (req, res) => {
-  res.redirect('/api/new_intention');
-};
 
 /*
   GET /api/message

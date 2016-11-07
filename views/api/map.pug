@@ -22,26 +22,24 @@ block content
 
   br
   p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a> 
-
+  
   #map
 
    br
   .row
-    .col-lg-8
-      br
-      table(border=0  )
-        thead
-        tbody
-          for result in mapLocations.reverse()
-            tr
-            td
-              img(src='/uploads/'+result.imagePath, height="100px")  
-            td
-              a(href='/api/intention/' + result._id ) #{result.name}
-            td
-              p #{result.description.substring(0,150)}
-            td
-              a(href='/api/intention/' + result._id ) #{result.category}
+  br
+  .row
+    .col-sm-12.col-md-11.col-lg-10
+      for result in mapLocations.reverse()
+        .row
+          .col-xs-12.col-sm-4
+            img(src='/uploads/'+result.imagePath, height="150px")  
+          .col-sm-2
+            a(href='/api/intention/' + result._id ) #{result.name}
+          .col-sm-3.col-md-5
+            p #{result.description.substring(0,255)}
+          .col-sm-1
+            a(href='/api/intention/' + result._id ) #{result.category}
 
 
 

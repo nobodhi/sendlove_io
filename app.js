@@ -179,11 +179,11 @@ app.get('/api/testmap', apiController.getTestMap);
   API Post Routes
 */
 
-app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
-app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
-app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe);
-app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
-app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
+// app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
+// app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
+// app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe);
+// app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
+// app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
 // app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postFileUpload); // imgur vs upload
 app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
 app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?

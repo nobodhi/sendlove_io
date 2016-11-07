@@ -7,20 +7,25 @@ const transporter = nodemailer.createTransport({
 	// token: process.env.SENDGRID_TOKEN
   }
 });
-/**
- * GET /
- * Home page.
- */
+/*
+  GET /
+  Home page.
+*/
 exports.index = (req, res) => {
+  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
+  var shareUrl = "http://" + req.hostname + '/'; 
   res.render('home', {
-    title: 'Home'
+    title: 'SendLove I/O',
+    shortDescription: 'Set your intention today on SendLove.io.',     
+    imagePath: imagePath + 'globe.gif',
+    shareUrl: shareUrl
   });
 };
 
-/**
- * POST /contact
- * Send a contact form via Nodemailer.
- */
+/*
+  POST /contact
+  Send a contact form via Nodemailer.
+*/
 exports.postContact = (req, res) => {
   req.assert('name', 'Name cannot be blank').notEmpty();
   req.assert('email', 'Email is not valid').isEmail();
