@@ -31,16 +31,13 @@ block content
 
   br
   .row
-    .col-lg-8  
+    .col-xs-12.col-md-10 
 
       h3=mapLocations.name
       img(class="img-thumbnail" title=mapLocations.name src=imagePath)
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
-
   
-  br
-  .row
-    .col-lg-8
+      br
       #map
 
   p
