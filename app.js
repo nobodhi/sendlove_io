@@ -174,6 +174,7 @@ app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage
 app.get('/api/recipient', passportConfig.isAuthenticated, apiController.getRecipient); 
 app.get('/api/map', apiController.getMap); 
 app.get('/api/testmap', apiController.getTestMap); 
+app.get('/api/feed', apiController.getFeed); 
 
 /*
   API Post Routes

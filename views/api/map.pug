@@ -21,19 +21,20 @@ block content
       | Share your intention
 
   br
-  p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a> 
+  p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a>  > <a href="/api/feed">Feed</a>  
   br
   .row
     .col-xs-11
       #map
 
-
+  // included in map.pug and mapfeed.pug.
   br
   .row
     .col-sm-12.col-md-11.col-lg-10
       for result in mapLocations.reverse()
         .row
           .col-xs-12.col-sm-4
+            br
             img(src='/uploads/'+result.imagePath, height="150px")  
           .col-sm-2
             a(href='/api/intention/' + result._id ) #{result.name}

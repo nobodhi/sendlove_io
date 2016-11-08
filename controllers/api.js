@@ -338,6 +338,65 @@ exports.postTestMap = (req, res) => {
 }
 
 
+/*
+  GET /api/feed
+  display the feed 
+*/
+ exports.getFeed = (req, res, next) => {
+ 
+  var getUrl = process.env.API_URL + '/thing';
+  var latitude; 
+  var longitude;
+  var feedKey;
+  var mapLocations;
+  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
+  var shareUrl = "http://" + req.hostname + '/api/feed/' 
+  
+  if (req.query.category != undefined) {
+    getUrl += '/?category=' + req.query.category;
+  }
+
+  request({
+    url: getUrl,
+    method: "GET",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    }
+    }
+
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+      
+      if (request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        return res.redirect('/api/feed');
+      }
+      mapLocations = request.body; // NB: this is how to query the sendlove.io api
+
+      if (mapLocations.length > 0) {
+        imagePath += mapLocations[mapLocations.length-1].imagePath; 
+      }
+      else {
+        imagePath += 'globe.gif';
+      }
+      
+      res.render('api/feed', {
+        title: 'Feed',
+        shortDescription: 'Set your intention today on SendLove.io.',       
+        latitude,
+        longitude,
+        feedKey: process.env.GOOGLE_MAPS_KEY,
+        mapLocations: mapLocations,
+        imagePath: imagePath, // + 'globe.gif',
+        shareUrl: shareUrl
+      });
+    }
+  );
+}
+
+
 
 /*
   GET /api/message
