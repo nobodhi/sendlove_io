@@ -80,7 +80,7 @@ exports.getNewIntention = (req, res) => {
 
 
   res.render('api/new_intention', {
-    title: 'Intention - SendLove.io',
+    title: 'New Intention',
     latitude,
     longitude,
     mapKey: process.env.GOOGLE_MAPS_KEY
@@ -254,7 +254,7 @@ exports.getTestMap = (req, res, next) => {
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
       // req.flash('success', { msg: 'results received' });
       res.render('api/testmap', {
-        title: 'testmap - SendLove.io',
+        title: 'testmap',
         description: 'SendLove I/O Worldwide Map of Intentions! Set your intention today on SendLove.io.',
         latitude,
         longitude,
@@ -324,7 +324,7 @@ exports.postTestMap = (req, res) => {
       }
       
       res.render('api/map', {
-        title: 'SendLove.io',
+        title: 'Map',
         shortDescription: 'Set your intention today on SendLove.io.',       
         latitude,
         longitude,
