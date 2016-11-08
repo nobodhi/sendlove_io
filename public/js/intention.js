@@ -4,7 +4,7 @@ var map, heatmap, locationsArray = [locations]; // You cannot apply cursor metho
 
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 13, // 13 is close
+    zoom: 11, // 13 is close
     center: {lat: locations.latitude, lng: locations.longitude}, // seattle. 
     // center: {lat: 37.775, lng: -122.434}, // SF
     mapTypeId: 'roadmap' // satellite terrain roadmap hybrid

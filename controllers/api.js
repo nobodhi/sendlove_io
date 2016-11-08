@@ -285,13 +285,17 @@ exports.postTestMap = (req, res) => {
 */
  exports.getMap = (req, res, next) => {
  
-  const getUrl = process.env.API_URL + '/thing';
+  var getUrl = process.env.API_URL + '/thing';
   var latitude; 
   var longitude;
   var mapKey;
   var mapLocations;
   var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
   var shareUrl = "http://" + req.hostname + '/api/map/' 
+  
+  if (req.query.category != undefined) {
+    getUrl += '/?category=' + req.query.category;
+  }
 
   request({
     url: getUrl,

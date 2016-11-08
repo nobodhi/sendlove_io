@@ -39,7 +39,7 @@ block content
           .col-sm-3.col-md-5
             p #{result.description.substring(0,255)}
           .col-sm-1
-            a(href='/api/intention/' + result._id ) #{result.category}
+            a(href='/api/map?category=' + result.category ) #{result.category}
 
 
 
