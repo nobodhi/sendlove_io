@@ -24,25 +24,11 @@ block content
   br
   p <a href="/api/new_intention"><b>Intention</b></a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a> 
   
-  // p #{image_upload_tag}
-  
   br
   .row
-    .col-lg-8
-      form(role='form', method='POST', enctype='multipart/form-data', onsubmit='modifyInputs();')
-        input(type='hidden', name='_csrf', value=_csrf)
-        input(type='hidden', id='latitude', name='latitude')
-        input(type='hidden', id='longitude', name='longitude')
-        input(type='hidden', id='imagePath', name='imagePath')
 
   .row
-    .col-lg-8
-      .form-group
-        .input-group
-          label.control-label Image
-          input(type='file', name='myFile')  
-  .row
-    .col-lg-8
+    .col-xs-8
       .form-group
         label.control-label Map it!
         #map
@@ -51,20 +37,34 @@ block content
           input(id="address" type="textbox" placeholder="Search Box", autofocus)
           input(id="submit" type="button" value="map it!")
 
-
+  .row  
+    .col-xs-8
+      form(role='form', method='POST', enctype='multipart/form-data', onsubmit='modifyInputs();')
+        input(type='hidden', name='_csrf', value=_csrf)
+        input(type='hidden', id='latitude', name='latitude')
+        input(type='hidden', id='longitude', name='longitude')
+        input(type='hidden', id='imagePath', name='imagePath')
 
         .form-group
           .input-group
             label.control-label Name 
             input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name')
+
+        .form-group
+          .input-group
+            label.control-label Image
+            input(type='file', name='myFile')  
+
         .form-group
           .input-group
             label.control-label Description
             textarea.form-control(name='description',  cols='35', rows='3', placeholder='Give it a great description')
+            
         .form-group
           .input-group
             label.control-label Category
             input.form-control(name='category', type='text', size='20', placeholder='Add a category')
+            
         .form-group
           .input-group
             button.btn.btn-default(id='submit', type='submit')

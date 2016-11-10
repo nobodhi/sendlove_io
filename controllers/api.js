@@ -427,9 +427,10 @@ exports.postMessage = (req, res, next) => {
 
   const message = {
     to: req.body.telephone,
-    from: '+16233350027', // TODO - set in environment variables
+    from: TWILIO_SMS_NUMBER, // TODO - Allow multiple numbers to by dynamically set by business logic
     body: req.body.message + " - " + shareUrl
-  };
+  }; 
+  // todo MediaUrl, MessagingServiceSid
   
   twilio.sendMessage(message, (err, responseData) => {
     if (err) { return next(err.message); }
