@@ -14,6 +14,13 @@ block content
       i.fa.fa-map-marker 
       | Create your intention
       
+  br
+  #app
+  
+  br
+  a(class="like-button", href="")
+    img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20") 
+    |&nbsp;like
 
     
   br
@@ -31,6 +38,24 @@ block content
         label.control-label Map it!
         #map(style="width:600px;height:400px") 
 
+  // included in map.pug and feed.pug.
+  br
+  .row
+    .col-sm-12.col-md-11.col-lg-10
+      for result in mapLocations.reverse()
+        .row
+          .col-xs-12.col-sm-4
+            br
+            img(src='/uploads/'+result.imagePath, height="150px")  
+          .col-sm-2
+            a(href='/api/intention/' + result._id ) #{result.name}
+          .col-sm-3.col-md-5
+            p #{result.description.substring(0,255)}..
+          .col-sm-1
+            a(href='/api/feed?category=' + result.category ) #{result.category}
+            p
+
+
   br
   .row
     .col-sm-6
@@ -38,19 +63,27 @@ block content
           for result in mapLocations
             p #{result._id}, #{result.latitude}, #{result.longitude}
 
+            
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
 
+  // put jquery before scripts that use it
+  script(src="/js/jquery.min.js") 
+
   //- in development append a pseudo version number so that the javascript always reloads.
-  //- otherwise do this:
-  //- script(scr='/js/testmap.js' )
   script.
     document.write("<script type='text/javascript' var locations=locals.mapLocations src='/js/testmap.js?" + Date.now() + "'><\/script>");
   
   script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')
   
-  
+  //script(src="/js/react/react.js") 
+  //script(src="/js/react/react-dom.js")
+  //script.
+  //  document.write("<script type='text/javascript' src='/js/testmap-react.js?" + Date.now() + "'><\/script>");
+
+
+
   style.
     #map {
       height: 100%;

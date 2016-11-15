@@ -171,14 +171,19 @@ app.get('/api/upload', apiController.getFileUpload);
 app.get('/api/new_intention', passportConfig.isAuthenticated, apiController.getNewIntention); 
 app.get('/api/intention/:token', apiController.getIntention); 
 app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage); 
-app.get('/api/recipient', passportConfig.isAuthenticated, apiController.getRecipient); 
 app.get('/api/map', apiController.getMap); 
-app.get('/api/testmap', apiController.getTestMap); 
 app.get('/api/feed', apiController.getFeed); 
+// app.get('/api/detail', passportConfig.isAuthenticated, apiController.getDetail);  // details will be tied to intentions
+app.get('/api/testmap', apiController.getTestMap); 
 
 /*
   API Post Routes
 */
+app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
+app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?
+app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
+app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
+// app.post('/api/testmap', apiController.postTestMap); 
 
 // app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
 // app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
@@ -186,11 +191,6 @@ app.get('/api/feed', apiController.getFeed);
 // app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
 // app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
 // app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postFileUpload); // imgur vs upload
-app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
-app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?
-app.post('/api/recipient', passportConfig.isAuthenticated, apiController.postRecipient);
-app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
-app.post('/api/testmap', apiController.postTestMap); // optional login? checks if user.id exists
 
 /*
   OAuth authentication routes. (Sign in)

@@ -45,30 +45,6 @@ exports.getApi = (req, res) => {
 };
 
 
-/*
-  GET /api/upload
-  File Upload API example.
-*/
- 
-exports.getFileUpload = (req, res, next) => {
-
-  // var cloudinary_cors = "http://" + req.headers.host + "/html/cloudinary_cors.html";
-  // var image_upload_tag = cloudinary.uploader.image_upload_tag('imagePath', { callback: cloudinary_cors });
-  
-  res.render('api/upload', {
-    title: 'File Upload'
-    // image_upload_tag: image_upload_tag
-  });
-};
-
-exports.postFileUpload = (req, res, next) => {
-  req.flash('success', { msg: 'File was uploaded successfully.' });
-  res.redirect('/api/upload');
-};
-
-
-
-
 
 /*
   GET /api/new_intention
@@ -270,8 +246,7 @@ exports.getTestMap = (req, res, next) => {
 
 /*
   POST /api/testmap
-  Choose a intention from the map
-
+  test posting
 */
 exports.postTestMap = (req, res) => {
   res.redirect('/api/testmap');
@@ -400,7 +375,7 @@ exports.postTestMap = (req, res) => {
 
 /*
   GET /api/message
-  Send a message to a recipient
+  Send a message via SMS
 */
 exports.getMessage = (req, res) => {
   res.render('api/message', {
@@ -440,22 +415,22 @@ exports.postMessage = (req, res, next) => {
 }
 
 /*
-  GET /api/recipient
-  add a recipient to a intention
+  GET /api/detail
+  add a detail to an intention. NB: this page may not ever use get, only post.
 */
-exports.getRecipient = (req, res) => {
-  res.render('api/recipient', {
-    title: 'Recipient - SendLove.io'
+exports.getDetail = (req, res) => {
+  res.render('api/detail', {
+    title: 'detail - SendLove.io'
   });
 }
 
 /*
-  POST /api/recipient
-  Add a new recipient 
+  POST /api/detail
+  Add a new detail to an intention
 
 */
-exports.postRecipient = (req, res) => {
-  res.redirect('/api/message');
+exports.postDetail = (req, res) => {
+  res.redirect('/api/detail');
 }
 
 
@@ -513,27 +488,28 @@ exports.getGoodNews = (req, res, next) => {
     }
   );
 };
+
+
 /*
-  request.get('https://www.reddit.com/r/UpliftingNews/', (err, request, body) => {
-    const $ = cheerio.load(body);
-    $('.title a[href^="http"]').each((index, element) => {
-      links.push($(element));
-    });
-  }),
-  request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
-    const $ = cheerio.load(body);
-      $('.card__headlines a[href^="http"]').each((index, element) => {
-          links_hp.push($(element));
-      });
-  }), 
-  res.render('api/goodnews', {
-    title: 'Good News',
-    links,
-    links_hp
-  });
+  GET /api/upload
+  File Upload API example.
 */
+ 
+exports.getFileUpload = (req, res, next) => {
 
+  // var cloudinary_cors = "http://" + req.headers.host + "/html/cloudinary_cors.html";
+  // var image_upload_tag = cloudinary.uploader.image_upload_tag('imagePath', { callback: cloudinary_cors });
+  
+  res.render('api/upload', {
+    title: 'File Upload'
+    // image_upload_tag: image_upload_tag
+  });
+};
 
+exports.postFileUpload = (req, res, next) => {
+  req.flash('success', { msg: 'File was uploaded successfully.' });
+  res.redirect('/api/upload');
+};
 
 
 

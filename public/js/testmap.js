@@ -2,6 +2,22 @@
 var map, heatmap; 
 // leaflet? 
 
+$(function() {
+  $('.like-button').click(function() {
+    var obj = $(this);
+    var img = obj.find("img");
+    var imgSrcVal = img.attr("src");
+    if (imgSrcVal == '/uploads/heart_40_35_gray.gif') {
+      obj.data('liked', false);
+      img.attr('src','/uploads/heart_40_35.gif');
+    } else {
+      obj.data('liked', true);
+      img.attr('src','/uploads/heart_40_35_gray.gif');
+    }
+    return false; // shorthand for event.preventDefault(); event.stopPropagation(); 
+  });
+});
+
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 10, // 13 is close

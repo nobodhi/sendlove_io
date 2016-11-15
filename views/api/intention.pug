@@ -29,28 +29,40 @@ block content
   br
   //- p=shareUrl
 
-  br
-  .row
-    .col-xs-12.col-md-10 
 
+  .row
+    .col-xs-10.col-md-8
       h3=mapLocations.name
+
+    .col-xs-2
+      br
+      a(class="like-button", href="")
+        img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom") 
+        |&nbsp;like      
+      
+      
+  .row
+    .col-xs-10.col-md-8         
       img(class="img-thumbnail" title=mapLocations.name src=imagePath)
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
   
-      br
+  .row
+    .col-xs-10.col-md-8
       #map
 
-  p
-  a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
+      p
+      a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
 
-  
+
+    
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
+
+  // put jquery before scripts that use it
+  script(src="/js/jquery.min.js") 
     
   //- in development append a pseudo version number so that the javascript always reloads.
-  //- otherwise do this:
-  //- script(scr='/js/intention.js')
   script.
     document.write("<script type='text/javascript' var locations=locals.mapLocations src='/js/intention.js?" + Date.now() + "'><\/script>");
     

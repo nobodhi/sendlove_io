@@ -58,13 +58,6 @@ function initMap() {
   });  
   
 
-  // testing recenter
-  //   var pos = {
-  //     lat: locations[0].latitude,
-  //     lng: locations[0].longitude
-  //   };  
-  // map.setCenter(pos);
-  // map.setZoom(4);
   
   // if there are not very many markers, make them bigger:
   
