@@ -65,15 +65,59 @@ exports.getNewIntention = (req, res) => {
   });
 }
 
+
 /*
   POST /api/detail
-  Add a new detail to an intention
-
+  Create a new detail on api.sendlove.io Question. do we return to intention/:id? or simply not return?
+  
+  TODO redirect simply to the page that you came from
+  
 */
-exports.postDetail = (req, res) => {
-  res.redirect('/api/detail');
+exports.postDetail = (req, res, next) => {
+  var thingId = req.body.thingId;
+  var personId = req.body.personId;
+  console.log("posting detail in express for thingId " + thingId + " and  personId " + personId);
+  // check errors
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('errors', errors);
+    //res.redirect('/api/intention/' + thingId);
+    return res.send();
+  }
+  // set API post url, and process form
+  const postUrl = process.env.API_URL + '/part'
+  var formData = {
+    thingId: thingId, // create the route then check how to pass this
+    personId: req.user._id,
+    partType: "like",
+    nValue: 1 // TODO pass as parameter > 1
+  }
+  var jsonData = JSON.stringify(formData); 
+  //console.log(formData);
+  console.log(jsonData);
+  request({
+    url: postUrl,
+    method: "POST",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: jsonData
+    }
+    ,(err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) { return next(err); }
+      if (request.statusCode !==200) {
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        //res.redirect('/api/intention/' + thingId);
+        return res.send();
+      }
+      req.flash('success', { msg: 'Like added!' });
+      //res.redirect('/api/intention/' + thingId);
+      return res.send();
+    }
+  );
 }
-
 
 /*
   POST /api/new_intention

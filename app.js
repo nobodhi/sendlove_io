@@ -83,7 +83,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload' || req.path === '/api/new_intention') { // KLUDGE: CSRF multipart issue.
+  if (req.path === '/api/upload' || req.path === '/api/new_intention') { // TODO KLUDGE: CSRF multipart issue.
     next();
   } else {
     lusca.csrf()(req, res, next);
@@ -182,6 +182,7 @@ app.get('/api/testmap', apiController.getTestMap);
 app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
 app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
+app.post('/api/intention', apiController.postDetail);
 app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
 // app.post('/api/testmap', apiController.postTestMap); 
 

@@ -6,9 +6,11 @@ var map, heatmap;
 $(function() {
   $('.like-button').click(function() {
     //event.preventDefault();
+    
+    console.log(locations._id);
   
     if (typeof user != "undefined") {
-      console.log("logged in");
+      // handle ui
       var obj = $(this);
       var img = obj.find("img");
       var imgSrcVal = img.attr("src");
@@ -19,14 +21,32 @@ $(function() {
         obj.data('liked', true);
         img.attr('src','/uploads/heart_40_35_gray.gif');
       }
-      var data = {};
-      data.thingId = locations._id;
-      data.personId = user._id;
-      data.partType = "like"
-      data.nValue = 1;
-    }
+      if (!obj.data('liked')) {
 
-    // console.log($(this).html());
+      // handle post
+        var data = {};
+        data.thingId = locations._id;
+        data.personId = user._id;
+        data.partType = "like";
+        data.nValue = 1;
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-Token': csrf
+          }
+        });
+        $.ajax({
+          type: 'POST',
+          url: '/api/detail/',
+          data: data,
+          dataType: 'application/json',
+          success: function(data) {
+            console.log('success');
+            console.log(data);
+          }
+        });
+
+      }
+    }
     return false; // shorthand for event.preventDefault(); event.stopPropagation(); 
   });
 });
@@ -39,9 +59,6 @@ function initMap() {
     mapTypeId: 'roadmap' // satellite terrain roadmap hybrid
   });
 
-  console.log(locations._id);
-  console.log(locations.name);
-  console.log(locations.latitude);
   
 //   TODO: center on user's location or on first object returned.. ONlY WORKS ON HTTPS
 //   if (navigator.geolocation) {

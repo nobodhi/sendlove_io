@@ -63,6 +63,8 @@ block content
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
+  script(type='text/javascript').
+    var csrf =!{JSON.stringify(_csrf)}
 
   // put jquery before scripts that use it
   script(src="/js/jquery.min.js") 
