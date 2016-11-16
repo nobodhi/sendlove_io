@@ -1,21 +1,32 @@
 
-var map, heatmap, locationsArray = [locations]; 
+var map, heatmap;
 // Mongoose cannot apply cursor methods to the result of findOne() because a single document is returned. You have access to the document directly
 
 // jquery function toggles like button
 $(function() {
   $('.like-button').click(function() {
-    var obj = $(this);
-    var img = obj.find("img");
-    var imgSrcVal = img.attr("src");
-    if (imgSrcVal == '/uploads/heart_40_35_gray.gif') {
-      obj.data('liked', false);
-      img.attr('src','/uploads/heart_40_35.gif');
-    } else {
-      obj.data('liked', true);
-      img.attr('src','/uploads/heart_40_35_gray.gif');
+    //event.preventDefault();
+  
+    if (typeof user != "undefined") {
+      console.log("logged in");
+      var obj = $(this);
+      var img = obj.find("img");
+      var imgSrcVal = img.attr("src");
+      if (imgSrcVal == '/uploads/heart_40_35_gray.gif') {
+        obj.data('liked', false);
+        img.attr('src','/uploads/heart_40_35.gif');
+      } else {
+        obj.data('liked', true);
+        img.attr('src','/uploads/heart_40_35_gray.gif');
+      }
+      var data = {};
+      data.thingId = locations._id;
+      data.personId = user._id;
+      data.partType = "like"
+      data.nValue = 1;
     }
-    console.log($(this).html());
+
+    // console.log($(this).html());
     return false; // shorthand for event.preventDefault(); event.stopPropagation(); 
   });
 });

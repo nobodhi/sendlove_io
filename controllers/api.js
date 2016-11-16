@@ -66,6 +66,16 @@ exports.getNewIntention = (req, res) => {
 }
 
 /*
+  POST /api/detail
+  Add a new detail to an intention
+
+*/
+exports.postDetail = (req, res) => {
+  res.redirect('/api/detail');
+}
+
+
+/*
   POST /api/new_intention
   Create a new intention on api.sendlove.io and return it to the user
 
@@ -102,7 +112,6 @@ exports.postIntention = (req, res, next) => {
     return res.redirect('/api/new_intention');
   }
 
-  
   // set API post url, and process form
   const postUrl = process.env.API_URL + '/thing'
   var formData = {
@@ -362,7 +371,6 @@ exports.postTestMap = (req, res) => {
         shortDescription: 'Set your intention today on SendLove.io.',       
         latitude,
         longitude,
-        feedKey: process.env.GOOGLE_MAPS_KEY,
         mapLocations: mapLocations,
         imagePath: imagePath, // + 'globe.gif',
         shareUrl: shareUrl
@@ -422,15 +430,6 @@ exports.getDetail = (req, res) => {
   res.render('api/detail', {
     title: 'detail - SendLove.io'
   });
-}
-
-/*
-  POST /api/detail
-  Add a new detail to an intention
-
-*/
-exports.postDetail = (req, res) => {
-  res.redirect('/api/detail');
 }
 
 

@@ -54,7 +54,12 @@ block content
       a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
 
 
-    
+  - if (user != undefined) 
+    //- this is the simple way of making a local available to client javascript.
+    script(type='text/javascript').
+      var user =!{JSON.stringify(user)}
+      
+  
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
