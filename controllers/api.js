@@ -112,7 +112,6 @@ exports.postDetail = (req, res, next) => {
         //res.redirect('/api/intention/' + thingId);
         return res.send();
       }
-      req.flash('success', { msg: 'Like added!' });
       //res.redirect('/api/intention/' + thingId);
       return res.send();
     }
@@ -196,14 +195,15 @@ exports.postIntention = (req, res, next) => {
   Retrieve a single intention
 */
 exports.getIntention = (req, res) => {
-  const getUrl = process.env.API_URL + '/thing/' + req.params.token;
+  const token = req.params.token;
+  const getUrl = process.env.API_URL + '/thing/' + token;
   var latitude; 
   var longitude;
   var mapKey;
   var mapLocations;
   var title;
   var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
-  var shareUrl = "http://" + req.hostname + '/api/intention/' + req.params.token;
+  var shareUrl = "http://" + req.hostname + '/api/intention/' + token;
 
   request({
     url: getUrl,
@@ -235,7 +235,7 @@ exports.getIntention = (req, res) => {
         mapKey: process.env.GOOGLE_MAPS_KEY,
         mapLocations: mapLocations,
         imagePath: imagePath,
-        token: req.params.token,
+        token: token,
         shareUrl: shareUrl
       });
     }
@@ -252,47 +252,52 @@ exports.getIntention = (req, res) => {
 //     token: token
 
 
-
 /*
   GET /api/testmap
   this is the dynamic version
 */
 exports.getTestMap = (req, res, next) => {
-  const getUrl = process.env.API_URL + '/thing';
-  var latitude; 
-  var longitude;
-  var mapKey;
-  var mapLocations;
-
-  request({
-    url: getUrl,
-    method: "GET",
-    json: true,
-    headers: {
-      "Content-Type": "application/json",
-    }
-    }
-    ,(err, request, body) => {
-      // `body` is a js object if request was successful
-      if (err) { return next(err); }
-
-      if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        return res.redirect('/api/testmap');
-      }
-      mapLocations = request.body; // NB: this is how to query the sendlove.io api
-      // req.flash('success', { msg: 'results received' });
-      res.render('api/testmap', {
-        title: 'testmap',
-        description: 'SendLove I/O Worldwide Map of Intentions! Set your intention today on SendLove.io.',
-        latitude,
-        longitude,
-        mapKey: process.env.GOOGLE_MAPS_KEY,
-        mapLocations: mapLocations
+  const token = '58221c6f0c8dff1c24afba05' // req.params.token;
+  const getUrl = process.env.API_URL + '/thing/' + token;
+  const getPartsUrl = process.env.API_URL + '/part/';
+  const mapKey = process.env.GOOGLE_MAPS_KEY;
+  var latitude ; 
+  var longitude ;
+  var intention;
+  var title ;
+  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
+  const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
+  var description;
+  var shortDescription;
+  async.parallel({
+    getIntention: (done) => {
+      request.get({ url: getUrl, json: true }, (err, request, body) => {
+        if (request.statusCode === 401) {
+          return done(new Error('Invalid Steam API Key'));
+        }
+        // set any variables 
+        imagePath += request.body.imagePath;
+         done(err, body);
       });
     }
-  );
+  },
+  (err, results) => {
+    if (err) { return next(err); }
+    res.render('api/intention', {
+      title: title,
+      description: description,
+      shortDescription: shortDescription,
+      latitude: latitude,
+      longitude: longitude,
+      mapKey: mapKey,
+      mapLocations: results.getIntention,
+      imagePath: imagePath,
+      token: token,
+      shareUrl: shareUrl
+    });
+  });
 }
+
 
 
 
@@ -867,7 +872,7 @@ exports.getSteam = (req, res, next) => {
       playerSummary: results.playerSummaries.response.players[0]
     });
   });
-};
+}
 
 /*
   GET /api/stripe
