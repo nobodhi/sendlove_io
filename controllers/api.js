@@ -264,7 +264,7 @@ exports.getTestMap = (req, res, next) => {
   var latitude ; 
   var longitude ;
   var intention;
-  var title ;
+  var title ='intention';
   var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
   const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
   var description;
@@ -277,7 +277,11 @@ exports.getTestMap = (req, res, next) => {
         }
         // set any variables 
         imagePath += request.body.imagePath;
-         done(err, body);
+        description = request.body.description;
+        shortDescription = request.body.description.substring(0,145) + "..";
+        latitude = request.body.latitude;
+        longitude = request.body.longitude;
+        done(err, body); // body = results.getIntention
       });
     }
   },
