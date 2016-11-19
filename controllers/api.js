@@ -276,13 +276,17 @@ exports.getTestMap = (req, res, next) => {
   if (req.user != undefined) {
     console.log("logged in, setting async");
     personId = req.user._id;
+    personId = JSON.stringify(personId);
+    personId = personId.replace(/"/g,""); // KLUDGE
+    queryString['personId']  = personId;
+    console.log("personId = " + personId);
+    console.log("queryString[personId] = " + queryString['personId']);
   }
   else {
-    console.log("not logged in, setting async");
-    personId = ""; // TODO KLUDGE - should use waterfall and just not set personId
+    console.log("not logged in, skipping personId");
   }
-  queryString['personId'] = personId;
-  
+
+
   async.parallel({
     getIntention: (done) => {
       request.get({ url: getUrl, json: true }, (err, request, body) => {
