@@ -36,9 +36,12 @@ block content
     .col-xs-2
       br
       a(class="like-button", href="")
-        - if (likesArray[0] != undefined)
-          - if (likesArray[0].personId == user._id)
-            img(class="like-image", src="/uploads/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
+        - if (likesArray != undefined)
+          - if (likesArray[0] != undefined)
+            - if (likesArray[0].personId == user._id)
+              img(class="like-image", src="/uploads/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
+            - else
+              img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
           - else
             img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
         - else
