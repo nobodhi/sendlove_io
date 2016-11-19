@@ -216,10 +216,8 @@ exports.getIntention = (req, res) => {
     ,(err, request, body) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
-
       if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        return res.redirect('/api/intention');
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
       title = request.body.name;
@@ -259,7 +257,7 @@ exports.getIntention = (req, res) => {
 exports.getTestMap = (req, res, next) => {
   const token = '58221c6f0c8dff1c24afba05' // req.params.token;
   const getUrl = process.env.API_URL + '/thing/' + token;
-  const getPartsUrl = process.env.API_URL + '/part/';
+  var getPartsUrl = process.env.API_URL + '/part';
   const mapKey = process.env.GOOGLE_MAPS_KEY;
   var latitude ; 
   var longitude ;
@@ -269,11 +267,28 @@ exports.getTestMap = (req, res, next) => {
   const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
   var description;
   var shortDescription;
+  // set up queryString
+  var queryString = {};
+  queryString['thingId'] = token;
+  var personId;
+
+  // set personId
+  if (req.user != undefined) {
+    console.log("logged in, setting async");
+    personId = req.user._id;
+  }
+  else {
+    console.log("not logged in, setting async");
+    personId = ""; // TODO KLUDGE - should use waterfall and just not set personId
+  }
+  queryString['personId'] = personId;
+  
   async.parallel({
     getIntention: (done) => {
       request.get({ url: getUrl, json: true }, (err, request, body) => {
-        if (request.statusCode === 401) {
-          return done(new Error('Invalid Steam API Key'));
+        if (err) { return next(err); }
+        if (request.statusCode !==200) {
+          req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
         // set any variables 
         imagePath += request.body.imagePath;
@@ -281,9 +296,21 @@ exports.getTestMap = (req, res, next) => {
         shortDescription = request.body.description.substring(0,145) + "..";
         latitude = request.body.latitude;
         longitude = request.body.longitude;
-        done(err, body); // body = results.getIntention
+        done(err, body); 
+      });
+    },
+    getLikes: (done) => {
+      queryString['partType'] = 'like';
+      request.get({ url: getPartsUrl, qs: queryString, json: true }, (err, request, body) => {
+        if (err) { return next(err); }
+        if (request.statusCode !==200) {
+          req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        }
+        // set any variables 
+        done(err, body); 
       });
     }
+
   },
   (err, results) => {
     if (err) { return next(err); }
@@ -297,11 +324,11 @@ exports.getTestMap = (req, res, next) => {
       mapLocations: results.getIntention,
       imagePath: imagePath,
       token: token,
-      shareUrl: shareUrl
+      shareUrl: shareUrl,
+      likesArray: results.getLikes
     });
   });
 }
-
 
 
 
@@ -349,7 +376,6 @@ exports.postTestMap = (req, res) => {
       
       if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        return res.redirect('/api/map');
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
 
@@ -408,7 +434,6 @@ exports.postTestMap = (req, res) => {
       
       if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        return res.redirect('/api/feed');
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
 

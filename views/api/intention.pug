@@ -27,7 +27,11 @@ block content
   - else
     p <a href="/api/intention/#{token}"><b>Intention</b></a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a> 
   br
-  //- p=shareUrl
+  - if (likesArray != undefined)
+    p the likesArray is not undefined
+  - else
+    p the likesArray is undefined
+    
 
 
   .row
