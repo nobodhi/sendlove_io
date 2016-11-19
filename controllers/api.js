@@ -197,49 +197,83 @@ exports.postIntention = (req, res, next) => {
 exports.getIntention = (req, res) => {
   const token = req.params.token;
   const getUrl = process.env.API_URL + '/thing/' + token;
-  var latitude; 
-  var longitude;
-  var mapKey;
-  var mapLocations;
-  var title;
+  var getPartsUrl = process.env.API_URL + '/part';
+  const mapKey = process.env.GOOGLE_MAPS_KEY;
+  var latitude ; 
+  var longitude ;
+  var intention;
+  var title ='intention';
   var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
-  var shareUrl = "http://" + req.hostname + '/api/intention/' + token;
+  const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
+  var description;
+  var shortDescription;
+  // set up queryString
+  var queryString = {};
+  queryString['thingId'] = token;
+  var personId;
 
-  request({
-    url: getUrl,
-    method: "GET",
-    json: true,
-    headers: {
-      "Content-Type": "application/json",
-    }
-    }
-    ,(err, request, body) => {
-      // `body` is a js object if request was successful
-      if (err) { return next(err); }
-      if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-      }
-      mapLocations = request.body; // NB: this is how to query the sendlove.io api
-      title = request.body.name;
-      imagePath += request.body.imagePath;
-      latitude = request.body.latitude;
-      longitude = request.body.longitude;
-      res.render('api/intention' , {
-        title: title,
-        description: request.body.description,
-        shortDescription: request.body.description.substring(0,145) + "..",
-        latitude: latitude,
-        longitude: longitude,
-        mapKey: process.env.GOOGLE_MAPS_KEY,
-        mapLocations: mapLocations,
-        imagePath: imagePath,
-        token: token,
-        shareUrl: shareUrl
+  // set personId
+  if (req.user != undefined) {
+    console.log("logged in, setting async");
+    personId = req.user._id;
+    personId = JSON.stringify(personId);
+    personId = personId.replace(/"/g,""); // KLUDGE
+    queryString['personId']  = personId;
+    console.log("personId = " + personId);
+    console.log("queryString[personId] = " + queryString['personId']);
+  }
+  else {
+    console.log("not logged in, skipping personId");
+  }
+
+
+  async.parallel({
+    getIntention: (done) => {
+      request.get({ url: getUrl, json: true }, (err, request, body) => {
+        if (err) { return next(err); }
+        if (request.statusCode !==200) {
+          req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        }
+        // set any variables 
+        imagePath += request.body.imagePath;
+        description = request.body.description;
+        shortDescription = request.body.description.substring(0,145) + "..";
+        latitude = request.body.latitude;
+        longitude = request.body.longitude;
+        done(err, body); 
+      });
+    },
+    // TODO very that this is the mongoose issue again with one record and many being different data types
+    getLikes: (done) => {
+      queryString['partType'] = 'like';
+      request.get({ url: getPartsUrl, qs: queryString, json: true }, (err, request, body) => {
+        if (err) { return next(err); }
+        if (request.statusCode !==200) {
+          req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        }
+        // set any variables 
+        done(err, body); 
       });
     }
-  );
-}
 
+  },
+  (err, results) => {
+    if (err) { return next(err); }
+    res.render('api/intention', {
+      title: title,
+      description: description,
+      shortDescription: shortDescription,
+      latitude: latitude,
+      longitude: longitude,
+      mapKey: mapKey,
+      mapLocations: results.getIntention,
+      imagePath: imagePath,
+      token: token,
+      shareUrl: shareUrl,
+      likesArray: results.getLikes
+    });
+  });
+}
 // intention end point no longer supported
 // 
 //   res.render('api/intention', {
