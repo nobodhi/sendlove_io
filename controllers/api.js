@@ -303,6 +303,7 @@ exports.getTestMap = (req, res, next) => {
         done(err, body); 
       });
     },
+    // TODO very that this is the mongoose issue again with one record and many being different data types
     getLikes: (done) => {
       queryString['partType'] = 'like';
       request.get({ url: getPartsUrl, qs: queryString, json: true }, (err, request, body) => {

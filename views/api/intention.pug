@@ -27,11 +27,6 @@ block content
   - else
     p <a href="/api/intention/#{token}"><b>Intention</b></a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a> 
   br
-  - if (likesArray != undefined)
-    p the likesArray is not undefined
-  - else
-    p the likesArray is undefined
-    
 
 
   .row
@@ -41,7 +36,13 @@ block content
     .col-xs-2
       br
       a(class="like-button", href="")
-        img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+        - if (likesArray[0] != undefined)
+          - if (likesArray[0].personId == user._id)
+            img(class="like-image", src="/uploads/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
+          - else
+            img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+        - else
+          img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
         //-|&nbsp;like      
       
       
@@ -62,14 +63,12 @@ block content
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
 
-  script(type='text/javascript').
-    var likes  =!{JSON.stringify(likesArray)}
-
     
   - if (user != undefined) 
     script(type='text/javascript').
       var user =!{JSON.stringify(user)}
-      
+    script(type='text/javascript').
+      var likes  =!{JSON.stringify(likesArray)}      
 
   script(type='text/javascript').
     var csrf =!{JSON.stringify(_csrf)}

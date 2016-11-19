@@ -1,13 +1,17 @@
 
 var map, heatmap;
-// Mongoose cannot apply cursor methods to the result of findOne() because a single document is returned. You have access to the document directly
-
+/*
+  NOTE:
+  Mongoose cannot apply cursor methods to the result of findOne() because a single document is returned. You have access to the document directly
+  mapLocations therefore is a single record.
+  likes is an array, of length 1.
+*/
+console.log(likes[0]);
 // jquery function toggles like button
 $(function() {
   $('.like-button').click(function() {
     //event.preventDefault();
-    
-    console.log(locations._id);
+    console.log('derp');
   
     if (typeof user != "undefined") {
       // handle ui
