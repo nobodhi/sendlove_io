@@ -76,25 +76,37 @@ exports.getNewIntention = (req, res) => {
 exports.postDetail = (req, res, next) => {
   var thingId = req.body.thingId;
   var personId = req.body.personId;
-  console.log("posting detail in express for thingId " + thingId + " and  personId " + personId);
+  var partType = req.body.partType;
+  var description = req.body.description;
+  console.log("posting " + partType + " detail for thingId " + thingId + " and  personId " + personId);
   // check errors
   const errors = req.validationErrors();
   if (errors) {
     req.flash('errors', errors);
-    //res.redirect('/api/intention/' + thingId);
-    return res.send();
+    res.redirect('/api/intention/' + thingId);
+    //return res.send();
   }
   // set API post url, and process form
   const postUrl = process.env.API_URL + '/part'
-  var formData = {
-    thingId: thingId, // create the route then check how to pass this
-    personId: req.user._id,
-    partType: "like",
-    nValue: 1 // TODO pass as parameter > 1
+  if (partType == 'comment') {
+    var formData = {
+      thingId: thingId, 
+      personId: req.user._id,
+      partType: partType,
+      description: description
+    }
+  }
+  else { // default to 'like'
+    var formData = {
+      thingId: thingId, 
+      personId: req.user._id,
+      partType: partType,
+      nValue: 1 // TODO pass as parameter > 1
+    }
   }
   var jsonData = JSON.stringify(formData); 
   //console.log(formData);
-  console.log(jsonData);
+  //console.log(jsonData);
   request({
     url: postUrl,
     method: "POST",
@@ -108,12 +120,16 @@ exports.postDetail = (req, res, next) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
       if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
-        //res.redirect('/api/intention/' + thingId);
-        return res.send();
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode  }); // todo pass json error msg from api?
+        res.redirect('/api/intention/' + thingId);
+        //return res.send();
       }
-      //res.redirect('/api/intention/' + thingId);
-      return res.send();
+      if (req.body.partType == 'comment') {
+        res.redirect('/api/intention/' + thingId);
+      }
+      else  {
+        return res.send();
+      }  
     }
   );
 }
@@ -166,7 +182,7 @@ exports.postIntention = (req, res, next) => {
     imagePath: newImage,
     category: req.body.category
   }
-  var jsonData = JSON.stringify(formData); // "{  \"name\": \"hello, world!\",  \"description\": \"first intention\",  \"personId\": \"57bc9f71cf9c78642abfe952\",  \"latitude\": 33,  \"longitude\": 112, \"image\": \"sendlove.io/images/my_intention.jpg\", \"category\": \"running\", \"altId\": \"0\"}" 
+  var jsonData = JSON.stringify(formData); 
   console.log(formData);
   request({
     url: postUrl,
@@ -181,7 +197,7 @@ exports.postIntention = (req, res, next) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
       if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        req.flash('errors', { msg: "An error occured with status code " + request.statusCode  });
         return res.redirect('/api/new_intention');
       }
       req.flash('success', { msg: 'Intention created!' });
@@ -220,7 +236,6 @@ exports.getIntention = (req, res) => {
     personId = personId.replace(/"/g,""); // KLUDGE
     queryString['personId']  = personId;
     console.log("personId = " + personId);
-    console.log("queryString[personId] = " + queryString['personId']);
   }
   else {
     console.log("not logged in, skipping personId");
@@ -254,6 +269,17 @@ exports.getIntention = (req, res) => {
         // set any variables 
         done(err, body); 
       });
+    },
+    getComments: (done) => {
+      queryString['partType'] = 'comment';
+      request.get({ url: getPartsUrl, qs: queryString, json: true }, (err, request, body) => {
+        if (err) { return next(err); }
+        if (request.statusCode !==200) {
+          req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
+        }
+        // set any variables 
+        done(err, body); 
+      });
     }
 
   },
@@ -270,7 +296,8 @@ exports.getIntention = (req, res) => {
       imagePath: imagePath,
       token: token,
       shareUrl: shareUrl,
-      likesArray: results.getLikes
+      likesArray: results.getLikes,
+      commentsArray: results.getComments
     });
   });
 }

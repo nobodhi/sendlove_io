@@ -120,7 +120,7 @@ app.get('/privacy', function (req, res) {
 
 // APP routes call the API functions by name.
 
-app.get('/', homeController.index);
+app.get('/', apiController.getFeed); // homeController.index);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/contact', contactController.getContact);
@@ -180,7 +180,7 @@ app.get('/api/testmap', apiController.getTestMap);
   API Post Routes
 */
 app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
-app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?
+app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postDetail); // todo postintentionByToken. file upload?
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
 app.post('/api/intention', passportConfig.isAuthenticated, apiController.postDetail);
 app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
