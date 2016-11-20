@@ -55,9 +55,7 @@ $(function() {
     }
     return false; // shorthand for event.preventDefault(); event.stopPropagation(); 
     /*
-      TODO "return false" prevents a post action and allows multiple likes, 
-      but gives the user the false impression they can unlike something, 
-      and gives the user the ability to like something over and over.
+      TODO "return false" prevents a post action and allows multiple likes
     */
   });
 });
@@ -65,32 +63,11 @@ $(function() {
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 11, // 13 is close
-    center: {lat: locations.latitude, lng: locations.longitude}, // seattle. 
-    // center: {lat: 37.775, lng: -122.434}, // SF
+    center: {lat: locations.latitude, lng: locations.longitude},  
     mapTypeId: 'roadmap' // satellite terrain roadmap hybrid
   });
 
-  
-//   TODO: center on user's location or on first object returned.. ONlY WORKS ON HTTPS
-//   if (navigator.geolocation) {
-//     navigator.geolocation.getCurrentPosition(function(position) {
-//       var pos = {
-//         lat: position.coords.latitude,
-//         lng: position.coords.longitude
-//       };
-// 
-//       infoWindow.setPosition(pos);
-//       infoWindow.setContent('Location found.');
-//       map.setCenter(pos);
-//     }, function() {
-//       handleLocationError(true, infoWindow, map.getCenter());
-//     });
-//   } else {
-//     // Browser doesn't support Geolocation
-//     handleLocationError(false, infoWindow, map.getCenter());
-//   }
-// 
-  
+ 
   
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: getPoints(),  // uses locals.locations
