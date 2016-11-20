@@ -225,7 +225,9 @@ exports.getIntention = (req, res) => {
   var shortDescription;
   // set up queryString
   var queryString = {};
+  var queryStringComments = {}; // TODO slice out personID
   queryString['thingId'] = token;
+  queryStringComments['thingId'] = token;
   var personId;
 
   // set personId
@@ -271,8 +273,9 @@ exports.getIntention = (req, res) => {
       });
     },
     getComments: (done) => {
-      queryString['partType'] = 'comment';
-      request.get({ url: getPartsUrl, qs: queryString, json: true }, (err, request, body) => {
+      queryStringComments['partType'] = 'comment';
+      console.log("in getComments: " + queryStringComments)
+      request.get({ url: getPartsUrl, qs: queryStringComments, json: true }, (err, request, body) => {
         if (err) { return next(err); }
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
