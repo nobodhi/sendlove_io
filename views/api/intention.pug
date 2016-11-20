@@ -61,6 +61,7 @@ block content
       p
       a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
 
+
   .row
     .col-xs-10.col-md-8
       form(role='form', method='POST') 
@@ -73,7 +74,7 @@ block content
         .form-group
           .input-group
             label.control-label Say Hi :)
-            textarea.form-control(name='description',  cols='35', rows='3', placeholder='Share a nice thought!')
+            textarea.form-control(name='description',  cols='35', rows='3', placeholder='Share a nice thought!', required=true)
         .form-group
           .input-group
             button.btn.btn-default(type='submit')

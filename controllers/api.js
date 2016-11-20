@@ -395,6 +395,7 @@ exports.postTestMap = (req, res) => {
   var mapLocations;
   var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
   var shareUrl = "http://" + req.hostname + '/api/feed/' 
+  var title = "world of intentions"
   
   if (req.query.category != undefined) {
     getUrl += '/?category=' + req.query.category;
@@ -426,7 +427,7 @@ exports.postTestMap = (req, res) => {
       }
       
       res.render('api/feed', {
-        title: 'Feed',
+        title: title,
         shortDescription: 'Set your intention today on SendLove.io.',       
         latitude,
         longitude,
@@ -469,7 +470,7 @@ exports.postMessage = (req, res, next) => {
 
   const message = {
     to: req.body.telephone,
-    from: TWILIO_SMS_NUMBER, // TODO - Allow multiple numbers to by dynamically set by business logic
+    from: '+16233350027', // TODO - Allow multiple numbers to by dynamically set by business logic
     body: req.body.message + " - " + shareUrl
   }; 
   // todo MediaUrl, MessagingServiceSid
