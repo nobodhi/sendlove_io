@@ -3,15 +3,13 @@ var map, heatmap;
 /*
   NOTE:
   Mongoose cannot apply cursor methods to the result of findOne() because a single document is returned. You have access to the document directly
-  mapLocations therefore is a single record.
-  likes is an array, of length 1.
+  mapLocations therefore is a single record, while likes is an array, of length 1.
 */
-console.log(likes[0]);
+
 // jquery function toggles like button
 $(function() {
   $('.like-button').click(function() {
     //event.preventDefault();
-    console.log('derp');
   
     if (typeof user != "undefined") {
       // handle ui
@@ -27,7 +25,7 @@ $(function() {
         img.attr('src','/uploads/heart_40_35_gray.gif');
         img.attr('title','like!');
       }
-      if (!obj.data('liked')) {
+      if (!obj.data('liked')) { 
 
       // handle post
         var data = {};
@@ -50,10 +48,17 @@ $(function() {
             console.log(data);
           }
         });
-
       }
     }
+    else {
+      alert('login to like!');
+    }
     return false; // shorthand for event.preventDefault(); event.stopPropagation(); 
+    /*
+      TODO "return false" prevents a post action and allows multiple likes, 
+      but gives the user the false impression they can unlike something, 
+      and gives the user the ability to like something over and over.
+    */
   });
 });
 

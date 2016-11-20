@@ -182,7 +182,7 @@ app.get('/api/testmap', apiController.getTestMap);
 app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
 app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postIntention); // todo postintentionByToken. file upload?
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
-app.post('/api/intention', apiController.postDetail);
+app.post('/api/intention', passportConfig.isAuthenticated, apiController.postDetail);
 app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
 // app.post('/api/testmap', apiController.postTestMap); 
 
