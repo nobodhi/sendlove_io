@@ -247,7 +247,7 @@ exports.getIntention = (req, res) => {
   async.parallel({
     getIntention: (done) => {
       request.get({ url: getUrl, json: true }, (err, request, body) => {
-        if (err) { return next(err); }
+        if (err) { return next(err); } // todo fix next reference
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
@@ -264,7 +264,7 @@ exports.getIntention = (req, res) => {
     getLikes: (done) => {
       queryString['partType'] = 'like';
       request.get({ url: getPartsUrl, qs: queryString, json: true }, (err, request, body) => {
-        if (err) { return next(err); }
+        if (err) { return next(err); } // todo fix next reference
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
@@ -276,7 +276,7 @@ exports.getIntention = (req, res) => {
       queryStringComments['partType'] = 'comment';
       console.log("in getComments: " + queryStringComments)
       request.get({ url: getPartsUrl, qs: queryStringComments, json: true }, (err, request, body) => {
-        if (err) { return next(err); }
+        if (err) { return next(err); } // todo fix next reference
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }

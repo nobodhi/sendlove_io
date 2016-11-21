@@ -11,7 +11,7 @@ block content
     h2
       a(href='/api/map')
         i.fa.fa-map-marker
-      | intention - SendLove.io
+      | #{title} - SendLove.io
 
   .btn-group.btn-group-justified
     a.btn.btn-primary(href='/api/new_intention')
@@ -37,7 +37,7 @@ block content
       br
       a(class="like-button", href="")
         - if (likesArray != undefined)
-          - if (likesArray[0] != undefined)
+          - if (user != undefined)
             - if (likesArray[0].personId == user._id)
               img(class="like-image", src="/uploads/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
             - else
