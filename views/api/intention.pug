@@ -95,7 +95,9 @@ block content
       .col-xs-10.col-md-8
         pre(white-space: wrap  )=comment.description
    
-  
+  // put jquery before scripts that use it
+  script(src="/js/jquery/jquery.min.js") 
+      
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
@@ -110,9 +112,7 @@ block content
   script(type='text/javascript').
     var csrf =!{JSON.stringify(_csrf)}
 
-  // put jquery before scripts that use it
-  script(src="/js/jquery/jquery.min.js") 
-    
+
   //- in development append a pseudo version number so that the javascript always reloads.
   script.
     document.write("<script type='text/javascript' var locations=locals.mapLocations src='/js/intention.js?" + Date.now() + "'><\/script>");
