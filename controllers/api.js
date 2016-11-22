@@ -53,13 +53,15 @@ exports.getApi = (req, res) => {
 exports.getNewIntention = (req, res) => {
   var latitude;
   var longitude;
+  const shareUrl = "http://" + req.hostname + "/api/map";
 
 
   res.render('api/new_intention', {
     title: 'New Intention',
     latitude,
     longitude,
-    mapKey: process.env.GOOGLE_MAPS_KEY
+    mapKey: process.env.GOOGLE_MAPS_KEY,
+    shareUrl: shareUrl
     //cloudinary_cors: cloudinary_cors,
     //image_upload_tag: image_upload_tag
   });
