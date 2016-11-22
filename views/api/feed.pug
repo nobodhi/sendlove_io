@@ -31,7 +31,8 @@ block content
         .row
           .col-xs-12.col-sm-4
             br
-            img(src='/uploads/'+result.imagePath, height="150px")  
+            a(href='/api/intention/' + result._id )
+              img(src='/uploads/'+result.imagePath, height="150px")  
           .col-sm-2
             a(href='/api/intention/' + result._id ) #{result.name}
           .col-sm-3.col-md-5
