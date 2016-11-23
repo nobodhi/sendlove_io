@@ -1,5 +1,5 @@
 var map, heatmap;
-// leaflet? 
+
 
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
