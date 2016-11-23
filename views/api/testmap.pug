@@ -1,1 +1,130 @@
-// if the api's testmap function points here, add pug content.
+extends ../layout
+
+block content
+  style.
+    #map {
+      height: 60vh;
+     
+    }
+
+  .page-header
+    h2
+      a(href='/api/map')
+        i.fa.fa-map-marker
+      | #{title} - SendLove.io
+
+  .btn-group.btn-group-justified
+    a.btn.btn-primary(href='/api/new_intention')
+      i.fa.fa-map-marker 
+      | Create your intention
+    a.btn.btn-primary(href='http://www.facebook.com/sharer/sharer.php?u='+shareUrl, target='_blank')
+      i.fa.fa-share
+      | Share your intention
+
+  br
+  - if (user != undefined) 
+    p <a href="/api/intention/#{token}"><b>Intention</b></a> > <a href="/api/message?intention=#{token}">Message</a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a> 
+  - else
+    p <a href="/api/intention/#{token}"><b>Intention</b></a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a> 
+  br
+
+
+  .row
+    .col-xs-10.col-md-8
+      h3=mapLocations.name
+
+    .col-xs-2
+      br
+      a(class="like-button", href="")
+        - if (likesArray != undefined)
+          - if (likesArray[0] != undefined)
+            - if (user != undefined)
+              - if (likesArray[0].personId == user._id)
+                img(class="like-image", src="/uploads/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
+              - else
+                img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+            - else
+              img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+          - else
+            img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+        - else
+          img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")           
+        //-|&nbsp;like      
+      
+      
+  .row
+    .col-xs-10.col-md-8         
+      a(href=imagePath)
+        img(class='img-thumbnail', title=mapLocations.name, src=imagePath, style='image-orientation: from-image', id='theImage')
+      
+      blockquote(style='white-space:pre-wrap;')=mapLocations.description
+  
+  .row
+    .col-xs-10.col-md-8
+      #map
+
+      p
+      a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
+
+
+  .row
+    .col-xs-10.col-md-8
+      form(role='form', method='POST') 
+        br
+        input(type='hidden', name='_csrf', value=_csrf)
+        - if (user != undefined)
+          input(type='hidden', name='personId', value=user.id) 
+        input(type='hidden', name='thingId', value=token)
+        input(type='hidden', name='partType', value='comment')
+        .form-group
+          .input-group
+            label.control-label Say Hi :)
+            textarea.form-control(name='description',  cols='35', rows='3', placeholder='Share a nice thought!', required=true)
+        .form-group
+          .input-group
+            button.btn.btn-default(type='submit')
+              i.fa.fa-location-arrow
+              | Send            
+  
+  br
+  h4 
+    i Replies
+  .row
+    .col-xs-10.col-md-8
+  for comment in commentsArray
+    .row
+      .col-xs-10.col-md-8
+        pre(white-space: wrap  )=comment.description
+  
+  pre(id='allMetaDataSpan')   //- very cool feature
+  
+  // put jquery before scripts that use it
+  script(src="/js/jquery/jquery.min.js") 
+  
+  // exif.js is an npm module used for image orientation. todo getelementbytagname=img
+  script(src="/js/exif.js")
+  script(src="/js/load-image.all.min.js")
+  script.
+    document.write("<script type='text/javascript' src='/js/rotate-image.js?" + Date.now() + "'><\/script>");
+  
+  //- this is the simple way of making a local available to client javascript.
+  script(type='text/javascript').
+    var locations =!{JSON.stringify(mapLocations)}
+
+    
+  - if (user != undefined) 
+    script(type='text/javascript').
+      var user =!{JSON.stringify(user)}
+    script(type='text/javascript').
+      var likes  =!{JSON.stringify(likesArray)}      
+
+  script(type='text/javascript').
+    var csrf =!{JSON.stringify(_csrf)}
+
+  //- in development append a pseudo version number so that the javascript always reloads.
+  script.
+    document.write("<script type='text/javascript' var locations=locals.mapLocations src='/js/testmap.js?" + Date.now() + "'><\/script>");
+    
+  script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')
+
+  
