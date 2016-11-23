@@ -48,7 +48,7 @@ function fixExifOrientation() {
         if (orientation != undefined) {
           console.log( thisImg + ": " + $( this ).attr('title') );
           console.log("exif orientation: " + orientation);
-          if (orientation == 1) {
+          if (orientation == 1 || orientation ==0) {
               //$img.addClass('flip'); break;
               rotate = 0;
               scaleX = 1;
