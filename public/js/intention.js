@@ -14,6 +14,7 @@ function getExif() {
       delete allMetaData['MakerNote'];
       delete allMetaData['UserComment'];
       delete allMetaData['CFAPattern'];
+      delete allMetaData['SubjectArea'];
       var allMetaDataSpan = document.getElementById("allMetaDataSpan");
       allMetaDataSpan.innerHTML = JSON.stringify(allMetaData, null, "\t");
     });
