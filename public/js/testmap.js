@@ -6,6 +6,19 @@ var map, heatmap;
   mapLocations therefore is a single record, while likes is an array, of length 1.
 */
 
+function getExif() {
+
+    var img2 = document.getElementById("theImage");
+    EXIF.getData(img2, function() {
+      var allMetaData = EXIF.getAllTags(this);
+      delete allMetaData['MakerNote'];
+      delete allMetaData['UserComment'];
+      delete allMetaData['CFAPattern'];
+      var allMetaDataSpan = document.getElementById("allMetaDataSpan");
+      allMetaDataSpan.innerHTML = JSON.stringify(allMetaData, null, "\t");
+    });
+}
+
 // jquery function toggles like button
 $(function() {
   $('.like-button').click(function() {

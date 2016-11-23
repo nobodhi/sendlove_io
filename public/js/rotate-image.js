@@ -23,6 +23,9 @@ function fixExifOrientation() {
   var rotate;
   var scaleX;
   var cssRotate;
+  if (typeof getExif !== 'undefined' && $.isFunction(getExif)) { // so this only runs where it should
+    getExif();
+  }
   $('img').each(function(thisImg) {
     if ($( this ).attr('src').indexOf("maps.gstatic.com") ==-1 && $( this ).attr('src').indexOf("maps.googleapis.com") ==-1 && $( this ).attr('src').indexOf("gif") ==-1 && $( this ).attr('src').indexOf("base64") ==-1 ){ 
       scaleX = 1;

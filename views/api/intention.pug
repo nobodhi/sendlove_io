@@ -54,8 +54,8 @@ block content
       
   .row
     .col-xs-10.col-md-8         
-      a(href=imagePath)
-        img(class='img-thumbnail', title=mapLocations.name, src=imagePath, style='image-orientation: from-image', id='theImage')
+      //-a(href=imagePath)
+      img(class='img-thumbnail', title=mapLocations.name, src=imagePath, style='image-orientation: from-image', id='theImage')
       
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
   
@@ -86,18 +86,27 @@ block content
               i.fa.fa-location-arrow
               | Send            
   
-  br
-  h4 
-    i Replies
   .row
     .col-xs-10.col-md-8
-  for comment in commentsArray
-    .row
-      .col-xs-10.col-md-8
-        pre(white-space: wrap  )=comment.description
+      h4 
+        i Replies
+      for comment in commentsArray
+        .row
+          .col-xs-10.col-md-8
+            pre(white-space: wrap  )=comment.description
   
-  pre(id='allMetaDataSpan')   //- very cool feature
-  
+  .row
+    .col-xs-10.col-md-8
+    br
+    br
+    br
+    hr 
+    i Photograph EXIF metadata - please ignore :)
+    pre(id='allMetaDataSpan') 
+
+
+
+      
   // put jquery before scripts that use it
   script(src="/js/jquery/jquery.min.js") 
   
