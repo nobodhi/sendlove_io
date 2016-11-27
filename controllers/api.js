@@ -139,11 +139,73 @@ exports.postDetail = (req, res, next) => {
 /*
   POST /api/new_intention
   Create a new intention on api.sendlove.io and return it to the user
-
+  multer has already uploaded the file. we get its file name, determine if it's valid, then delete it if it's not or rename it.
 */
 exports.postIntention = (req, res, next) => {
+
+  
+  var latitude = req.body.latitude;
+  var longitude = req.body.longitude;
+
+  
+  //console.log(util.inspect(req, false, null));
+  /*
+  files:
+   [ { fieldname: 'imgFile',
+       originalname: 'weird rotate 2.jpg',
+       encoding: '7bit',
+       mimetype: 'image/jpeg',
+       size: 657551,
+       bucket: 'sendloveio01',
+       key: '1480265396380',
+       acl: 'private',
+       contentType: 'image/jpeg',
+       contentDisposition: null,
+       storageClass: 'STANDARD',
+       metadata: { fieldName: 'imgFile' },
+       location: 'https://sendloveio01.s3-us-west-2.amazonaws.com/1480265396380',
+       etag: '"e3519cd5aac966e73fa7d6bae2bdacd1"' } ]  
+  */
+  
+  var newImage = req.files[0].key; 
+  var mimeType = req.files[0].mimetype.toString();
+  console.log("newImage = " + newImage);
+  console.log("mimeType = " + mimeType);
+
   const fs = require('fs');
   
+  if ( isNaN(latitude) || isNaN(longitude) ) {
+    req.flash('errors', { msg: "please include a location :) " });
+    return res.redirect('/api/new_intention');
+  }
+  
+//   const readChunk = require('read-chunk'); // npm install read-chunk 
+//   const fileType = require('file-type');
+//   const buffer = readChunk.sync("http://sendloveio.imgix.net/"+newImage, 0, 262);
+//   var newExt = fileType(buffer);
+//   const allowedImages = ['gif', 'jpg', 'png'];
+  
+  
+  const allowedImages = ["image/jpeg", "image/png", "image/gif", "image/x-ms-bmp"];
+  
+//   if (allowedImages.indexOf(mimeType.toString()) > -1) {
+//     //fs.unlinkSync(newImage); // TODO mark file for deletion
+//     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
+//     return res.redirect('/api/new_intention');
+//   }
+//   else {
+//     console.log("it is certainly an image! lol jk")
+//   }
+  if (!mimeType.startsWith("image/")) {
+    // It's an image.
+    req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
+    return res.redirect('/api/new_intention');
+  }
+  else {
+    console.log("ermagerd! it's not an image!")
+  }
+
+
   // check errors
   const errors = req.validationErrors();
   if (errors) {
@@ -151,41 +213,32 @@ exports.postIntention = (req, res, next) => {
     return res.redirect('/api/new_intention');
   }
   
-  // check image file type
-  if (req.file == undefined) {
-    req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
-    return res.redirect('/api/new_intention');
-  }
-  const readChunk = require('read-chunk'); // npm install read-chunk 
-  const fileType = require('file-type');
-  var newImage = req.file.filename;
-  const buffer = readChunk.sync('uploads/'+newImage, 0, 262);
-  var newExt = fileType(buffer);
-
-  // delete bad file or rename good file. KLUDGE.
-  const allowedImages = ['gif', 'jpg', 'png'];
-  if (allowedImages.indexOf(newExt.ext.toLowerCase()) > -1) {
-    newImage += "." + newExt.ext;
-    fs.renameSync("uploads/"+req.file.filename, "uploads/"+newImage); // TODO: try to map this with the uploads variable set in app.js
-  } else {
-    fs.unlinkSync('uploads/'+newImage); // TODO make asynchronous?
-    req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
-    return res.redirect('/api/new_intention');
-  }
-
+ 
+  // delete bad file or rename good file. TODO RENAME FILE ON S3 USING AWS-SDK
+  
+//   if (allowedImages.indexOf(newExt.ext.toLowerCase()) > -1) {
+//     newImage += "." + newExt.ext;
+//     fs.renameSync(origImage, newImage); // TODO: try to map this with the uploads variable set in app.js
+//   } else {
+//     fs.unlinkSync(newImage); // TODO make asynchronous?
+//     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
+//     return res.redirect('/api/new_intention');
+//   }
+// 
   // set API post url, and process form
   const postUrl = process.env.API_URL + '/thing'
   var formData = {
     name: req.body.name,
     description: req.body.description,
     personId: req.user._id,
-    latitude: Number(req.body.latitude),
-    longitude: Number(req.body.longitude),
+    latitude: Number(latitude),
+    longitude: Number(longitude),
     imagePath: newImage,
     category: req.body.category
   }
   var jsonData = JSON.stringify(formData); 
   console.log(formData);
+  console.log(postUrl);
   request({
     url: postUrl,
     method: "POST",
@@ -199,7 +252,7 @@ exports.postIntention = (req, res, next) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
       if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode  });
+        req.flash('errors', { msg: "An error occured while uploading with status code " + request.statusCode + ", message = " + request.body.message  });
         return res.redirect('/api/new_intention');
       }
       req.flash('success', { msg: 'Intention created!' });
@@ -221,7 +274,7 @@ exports.getIntention = (req, res) => {
   var longitude ;
   var intention;
   var title ='intention';
-  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
+  var imagePath = "http://sendloveio.imgix.net/";
   const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
   var description;
   var shortDescription;
@@ -322,7 +375,7 @@ exports.getTestMap = (req, res, next) => {
   var longitude ;
   var intention;
   var title ='intention';
-  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO dynamically determine protocol, parameterize folder
+  var imagePath = "http://sendloveio.imgix.net/";
   const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
   var description;
   var shortDescription;
@@ -432,7 +485,7 @@ exports.postTestMap = (req, res) => {
   var longitude;
   var mapKey;
   var mapLocations;
-  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
+  var imagePath = "http://sendloveio.imgix.net/"; 
   var shareUrl = "http://" + req.hostname + '/api/map/' 
   
   if (req.query.category != undefined) {
@@ -490,7 +543,7 @@ exports.postTestMap = (req, res) => {
   var longitude;
   var feedKey;
   var mapLocations;
-  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
+  var imagePath = "http://sendloveio.imgix.net/";
   var shareUrl = "http://" + req.hostname + '/api/feed/' 
   var title = "world of intentions"
   
@@ -653,12 +706,9 @@ exports.getGoodNews = (req, res, next) => {
  
 exports.getFileUpload = (req, res, next) => {
 
-  // var cloudinary_cors = "http://" + req.headers.host + "/html/cloudinary_cors.html";
-  // var image_upload_tag = cloudinary.uploader.image_upload_tag('imagePath', { callback: cloudinary_cors });
-  
+
   res.render('api/upload', {
     title: 'File Upload'
-    // image_upload_tag: image_upload_tag
   });
 };
 

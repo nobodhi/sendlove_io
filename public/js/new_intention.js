@@ -89,10 +89,11 @@ function geocodeAddress(geocoder, resultsMap) {
 
 // set hidden field inputs
 function modifyInputs() {
+
   var latitudeInput = document.getElementById("latitude");
   var longitudeInput = document.getElementById("longitude");
   latitudeInput.value = latitude;
   longitudeInput.value = longitude;
   initMap();
-  //alert('final latitude = ' + latitude.toString() + ', longitude = ' + longitude.toString());
+
 }

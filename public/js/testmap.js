@@ -29,13 +29,13 @@ $(function() {
       var obj = $(this);
       var img = obj.find("img");
       var imgSrcVal = img.attr("src");
-      if (imgSrcVal == '/uploads/heart_40_35_gray.gif') {
+      if (imgSrcVal == 'http://sendloveio.imgix.net/heart_40_35_gray.gif') {
         obj.data('liked', false);
-        img.attr('src','/uploads/heart_40_35.gif');
+        img.attr('src','http://sendloveio.imgix.net/heart_40_35.gif');
         img.attr('title','liked!');
       } else {
         obj.data('liked', true);
-        img.attr('src','/uploads/heart_40_35_gray.gif');
+        img.attr('src','http://sendloveio.imgix.net/heart_40_35_gray.gif');
         img.attr('title','like!');
       }
       if (!obj.data('liked')) { 

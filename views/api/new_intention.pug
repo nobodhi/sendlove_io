@@ -4,7 +4,7 @@ extends ../layout
 block content
   style.
     #map {
-      height: 50vh;
+      height: 60vh;
      
     }
   .page-header
@@ -28,13 +28,13 @@ block content
   .row
 
   .row
-    .col-xs-8
+    .col-xs-10
       .form-group
         label.control-label Map it!
         #map
         br
         #floating-panel
-          input(id="address" type="textbox" placeholder="Street address", autofocus)
+          input(id="address" type="textbox" placeholder="Street address")
           input(id="submit" type="button" value="map it!")
 
   .row  
@@ -48,17 +48,17 @@ block content
         .form-group
           .input-group
             label.control-label Name 
-            input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name')
+            input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name', required)
 
         .form-group
           .input-group
             label.control-label Image 
-            input(type='file', name='myFile')  
+            input(type='file', name='imgFile', required)  
 
         .form-group
           .input-group
             label.control-label Description
-            textarea.form-control(name='description', wrap='soft', cols='35', rows='3', placeholder='Give it a great description')
+            textarea.form-control(name='description', wrap='soft', cols='35', rows='3', placeholder='Give it a great description', required)
             
         .form-group
           .input-group

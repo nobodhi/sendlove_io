@@ -40,22 +40,23 @@ block content
           - if (likesArray[0] != undefined)
             - if (user != undefined)
               - if (likesArray[0].personId == user._id)
-                img(class="like-image", src="/uploads/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
+                img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35.gif", height="20" valign="bottom", title="liked!") 
               - else
-                img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+                img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
             - else
-              img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+              img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
           - else
-            img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
+            img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!") 
         - else
-          img(class="like-image", src="/uploads/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")           
+          img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")           
         //-|&nbsp;like      
       
       
   .row
     .col-xs-10.col-md-8         
       a(href=imagePath)
-        img(class='img-thumbnail', title=mapLocations.name, src=imagePath, style='image-orientation: from-image', id='theImage')
+        //- TODO get orientation and fix w/ +'?or=6'
+        img(class='img-thumbnail', title=mapLocations.name, src=imagePath+"?w=800", id='theImage') 
       
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
   
@@ -106,11 +107,11 @@ block content
   // put jquery before scripts that use it
   script(src="/js/jquery/jquery.min.js") 
   
-  // exif.js is an npm module used for image orientation. todo getelementbytagname=img
-  script(src="/js/exif.js")
-  script(src="/js/load-image.all.min.js")
-  script.
-    document.write("<script type='text/javascript' src='/js/rotate-image.js?" + Date.now() + "'><\/script>");
+  //- exif.js is an npm module used for image orientation. todo getelementbytagname=img
+  //- script(src="/js/exif.js")
+  //- script(src="/js/load-image.all.min.js")
+  //- script.
+  //-   document.write("<script type='text/javascript' src='/js/rotate-image.js?" + Date.now() + "'><\/script>");
   
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').

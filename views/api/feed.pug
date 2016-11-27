@@ -32,7 +32,7 @@ block content
           .col-xs-12.col-sm-4
             br
             a(href='/api/intention/' + result._id )
-              img(src='/uploads/'+result.imagePath, title=result.name, height="150px")  
+              img(src='http://sendloveio.imgix.net/'+result.imagePath + "?h=150", title=result.name)  
           .col-sm-2
             a(href='/api/intention/' + result._id ) #{result.name}
           .col-sm-3.col-md-5
@@ -44,11 +44,11 @@ block content
   // put jquery before scripts that use it
   script(src="/js/jquery/jquery.min.js") 
   
-  // exif.js is an npm module used for image orientation. todo getelementbytagname=img
-  script(src="/js/exif.js")
-  script(src="/js/load-image.all.min.js")
-  script.
-    document.write("<script type='text/javascript' src='/js/rotate-image.js?" + Date.now() + "'><\/script>");
+  //- exif.js is an npm module used for image orientation. todo getelementbytagname=img
+  //- script(src="/js/exif.js")
+  //- script(src="/js/load-image.all.min.js")
+  //- script.
+  //-   document.write("<script type='text/javascript' src='/js/rotate-image.js?" + Date.now() + "'><\/script>");
             
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').

@@ -18,6 +18,9 @@ const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
 const uploadMulter = multer({ dest: path.join(__dirname, 'uploads') });
+const aws = require('aws-sdk')
+const multerS3 = require('multer-s3')
+
 
 /*
   Load environment variables from .env file, where API keys and passwords are configured.
@@ -108,6 +111,28 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
+
+
+// set up multer and S3
+
+// 16.11.27
+var s3 = new aws.S3({ /* ... */ }) // is this a var or a const?
+var uploadS3 = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.S3_BUCKET,
+    // region: process.env.AWS_REGION,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+//     metadata: function (req, file, cb) {
+//       cb(null, {fieldName: file.fieldname});
+//     },
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString())
+    }
+  })
+})
+
+
 /*
   Primary app routes.
 */
@@ -173,25 +198,23 @@ app.get('/api/intention/:token', apiController.getIntention);
 app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage); 
 app.get('/api/map', apiController.getMap); 
 app.get('/api/feed', apiController.getFeed); 
-// app.get('/api/detail', passportConfig.isAuthenticated, apiController.getDetail);  // details will be tied to intentions
 app.get('/api/testmap', apiController.getTestMap); 
 
 /*
   API Post Routes
 */
-app.post('/api/new_intention', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postIntention);
-app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postDetail); // todo postintentionByToken. file upload?
+app.post('/api/new_intention', passportConfig.isAuthenticated, uploadS3.array('imgFile'), apiController.postIntention); 
+app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postDetail); 
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
 app.post('/api/intention', passportConfig.isAuthenticated, apiController.postDetail);
 app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
-// app.post('/api/testmap', apiController.postTestMap); 
 
 // app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
 // app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
 // app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe);
 // app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
 // app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
-// app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('myFile'), apiController.postFileUpload); // imgur vs upload
+// app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('imgFile'), apiController.postFileUpload); 
 
 /*
   OAuth authentication routes. (Sign in)

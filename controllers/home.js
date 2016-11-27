@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   Home page.
 */
 exports.index = (req, res) => {
-  var imagePath = "http://" + req.hostname + '/uploads/'; // TODO 
+  var imagePath = "http://sendloveio.imgix.net/"; 
   var shareUrl = "http://" + req.hostname + '/'; 
   res.render('home', {
     title: 'SendLove I/O',

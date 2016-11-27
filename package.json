@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "async": "^2.0.1",
+    "aws-sdk": "^2.7.7",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.15.2",
     "cheerio": "^0.22.0",
@@ -36,6 +37,7 @@
     "mongoose": "^4.5.10",
     "morgan": "^1.7.0",
     "multer": "^1.2.0",
+    "multer-s3": "^2.5.0",
     "node-foursquare": "^0.3.0",
     "node-linkedin": "^0.5.4",
     "node-sass-middleware": "^0.9.8",
