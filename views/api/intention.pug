@@ -6,6 +6,9 @@ block content
       height: 60vh;
      
     }
+    pre {
+      white-space: pre-wrap;       /* Since CSS 2.1 */
+    }
 
   .page-header
     h2
@@ -92,7 +95,7 @@ block content
       for comment in commentsArray
         .row
           .col-xs-10.col-md-8
-            pre(white-space: wrap  )=comment.description
+            blockquote(style='white-space:pre-wrap;background: #f9f9f9;font-size: 1em;')=comment.description
   
   .row
     .col-xs-10.col-md-8
