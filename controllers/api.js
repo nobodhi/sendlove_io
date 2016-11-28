@@ -185,7 +185,7 @@ exports.postIntention = (req, res, next) => {
   
 
   // set API post url, and process form
-  const postUrl = process.env.API_URL + '/thing'
+  const postUrl = process.env.API_URL + '/thing';
   var formData = {
     name: req.body.name,
     description: req.body.description,
@@ -288,7 +288,7 @@ exports.getIntention = (req, res) => {
     },
     getComments: (done) => {
       queryStringComments['partType'] = 'comment';
-      console.log("in getComments: " + queryStringComments)
+      //console.log("in getComments: " + queryStringComments)
       request.get({ url: getPartsUrl, qs: queryStringComments, json: true }, (err, request, body) => {
         if (err) { return next(err); } // todo fix next reference
         if (request.statusCode !==200) {
@@ -622,16 +622,16 @@ exports.getGoodNews = (req, res, next) => {
           done(err, links);
         });
       }, 
-      getHP: (done) => {
-        request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
-          const $ = cheerio.load(body);
-          $('.card__headlines a[href^="http"]').each((index, element) => {
-            links_hp.push($(element));
-            
-          });
-          done(err, links_hp);
-        });
-      }, 
+//       getHP: (done) => {
+//         request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
+//           const $ = cheerio.load(body);
+//           $('.card__headlines a[href^="http"]').each((index, element) => {
+//             links_hp.push($(element));
+//             
+//           });
+//           done(err, links_hp);
+//         });
+//       }, 
       getGN: (done) => {
         request.get('http://www.goodnewsnetwork.org/', (err, request, body) => {
           const $ = cheerio.load(body);
@@ -650,7 +650,7 @@ exports.getGoodNews = (req, res, next) => {
       res.render('api/goodnews', {
         title: "Good News",
         links: results.getReddit,
-        links_hp: results.getHP,
+        //links_hp: results.getHP,
         links_gn: results.getGN
       });
     }
