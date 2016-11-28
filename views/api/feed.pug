@@ -30,14 +30,13 @@ block content
       for result in mapLocations.reverse()
         .row
           .col-xs-10
-            br
-            a(href='/api/intention/' + result._id ) #{result.name}
+            h4
+              a(href='/api/intention/' + result._id ) #{result.name}
         .row
           .col-xs-10
             br
-            h4
-              a(href='/api/intention/' + result._id )
-                img(class='img-thumbnail', src='http://sendloveio.imgix.net/'+result.imagePath + "?h=500&q=60&auto=format,enhance", title=result.name)  
+            a(href='/api/intention/' + result._id )
+              img(class='img-thumbnail', src='http://sendloveio.imgix.net/'+result.imagePath + "?h=500&q=60&auto=format,enhance", title=result.name)  
         .row
           .col-xs-10
             br
@@ -46,6 +45,9 @@ block content
           .col-xs-10
             i
               a(href='/api/feed?category=' + result.category ) #{result.category}
+        .row
+          .col-xs-12.col-lg-10
+            br
             hr
 
 
