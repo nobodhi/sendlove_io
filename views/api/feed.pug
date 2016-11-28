@@ -26,20 +26,28 @@ block content
   // included in map.pug and feed.pug.
   br
   .row
-    .col-sm-12.col-md-11.col-lg-10
+    .col-xs-12.col-lg-10
       for result in mapLocations.reverse()
         .row
-          .col-xs-12.col-sm-4
+          .col-xs-12.col-lg-10
             br
-            a(href='/api/intention/' + result._id )
-              img(src='http://sendloveio.imgix.net/'+result.imagePath + "?h=150", title=result.name)  
-          .col-sm-2
             a(href='/api/intention/' + result._id ) #{result.name}
-          .col-sm-3.col-md-5
+        .row
+          .col-xs-12.col-lg-10
+            br
+            h4
+              a(href='/api/intention/' + result._id )
+                img(src='http://sendloveio.imgix.net/'+result.imagePath + "?w=300&h=300&fit=crop&crop=entropy", title=result.name)  
+        .row
+          .col-xs-12.col-lg-10
+            br
             p #{result.description.substring(0,255)}..
-          .col-sm-1
-            a(href='/api/feed?category=' + result.category ) #{result.category}
-            p
+        .row
+          .col-xs-12.col-lg-10
+            i
+              a(href='/api/feed?category=' + result.category ) #{result.category}
+            hr
+
 
   // put jquery before scripts that use it
   script(src="/js/jquery/jquery.min.js") 
