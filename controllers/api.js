@@ -149,62 +149,32 @@ exports.postIntention = (req, res, next) => {
 
   
   //console.log(util.inspect(req, false, null));
-  /*
-  files:
-   [ { fieldname: 'imgFile',
-       originalname: 'weird rotate 2.jpg',
-       encoding: '7bit',
-       mimetype: 'image/jpeg',
-       size: 657551,
-       bucket: 'sendloveio01',
-       key: '1480265396380',
-       acl: 'private',
-       contentType: 'image/jpeg',
-       contentDisposition: null,
-       storageClass: 'STANDARD',
-       metadata: { fieldName: 'imgFile' },
-       location: 'https://sendloveio01.s3-us-west-2.amazonaws.com/1480265396380',
-       etag: '"e3519cd5aac966e73fa7d6bae2bdacd1"' } ]  
-  */
-  
-  var newImage = req.files[0].key; 
-  var mimeType = req.files[0].mimetype.toString();
-  console.log("newImage = " + newImage);
-  console.log("mimeType = " + mimeType);
 
-  const fs = require('fs');
+  /*
+  valide the data entered by the user. TODO - go back and delete the image,
+  or never upload it in the first place, if it's a bad file.
+  */
   
   if ( isNaN(latitude) || isNaN(longitude) ) {
     req.flash('errors', { msg: "please include a location :) " });
     return res.redirect('/api/new_intention');
   }
-  
-//   const readChunk = require('read-chunk'); // npm install read-chunk 
-//   const fileType = require('file-type');
-//   const buffer = readChunk.sync("http://sendloveio.imgix.net/"+newImage, 0, 262);
-//   var newExt = fileType(buffer);
-//   const allowedImages = ['gif', 'jpg', 'png'];
-  
-  
-  const allowedImages = ["image/jpeg", "image/png", "image/gif", "image/x-ms-bmp"];
-  
-//   if (allowedImages.indexOf(mimeType.toString()) > -1) {
-//     //fs.unlinkSync(newImage); // TODO mark file for deletion
-//     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
-//     return res.redirect('/api/new_intention');
-//   }
-//   else {
-//     console.log("it is certainly an image! lol jk")
-//   }
-  if (!mimeType.startsWith("image/")) {
-    // It's an image.
+    
+  var newImage = req.files[0].key; 
+  //var mimeTypeClaimed = req.files[0].mimetype.toString();
+  var mimeTypeActual = req.files[0].contentType.toString(); // contentType is a metadata set in multerS3
+  if (!mimeTypeActual.startsWith("image/")) {
     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
     return res.redirect('/api/new_intention');
   }
-  else {
-    console.log("ermagerd! it's not an image!")
-  }
+  
+  var fileSize = req.files[0].size;
+  if (fileSize > 10000000) {
+    req.flash('errors', { msg: "Please upload an image smaller than 10 megs :) " });
+    return res.redirect('/api/new_intention');
+  }  
 
+  // TODO delete bad file USING AWS-SDK
 
   // check errors
   const errors = req.validationErrors();
@@ -213,18 +183,7 @@ exports.postIntention = (req, res, next) => {
     return res.redirect('/api/new_intention');
   }
   
- 
-  // delete bad file or rename good file. TODO RENAME FILE ON S3 USING AWS-SDK
-  
-//   if (allowedImages.indexOf(newExt.ext.toLowerCase()) > -1) {
-//     newImage += "." + newExt.ext;
-//     fs.renameSync(origImage, newImage); // TODO: try to map this with the uploads variable set in app.js
-//   } else {
-//     fs.unlinkSync(newImage); // TODO make asynchronous?
-//     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
-//     return res.redirect('/api/new_intention');
-//   }
-// 
+
   // set API post url, and process form
   const postUrl = process.env.API_URL + '/thing'
   var formData = {

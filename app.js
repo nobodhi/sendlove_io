@@ -113,24 +113,35 @@ app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }))
 
 
 
-// set up multer and S3
-
-// 16.11.27
+/*
+ 2016.11.27
+ set up multer and S3. TODO validate size and type of file. 
+*/ 
 var s3 = new aws.S3({ /* ... */ }) // is this a var or a const?
 var uploadS3 = multer({
   storage: multerS3({
     s3: s3,
     bucket: process.env.S3_BUCKET,
-    // region: process.env.AWS_REGION,
     contentType: multerS3.AUTO_CONTENT_TYPE,
-//     metadata: function (req, file, cb) {
-//       cb(null, {fieldName: file.fieldname});
-//     },
     key: function (req, file, cb) {
-      cb(null, Date.now().toString())
+      var ext = "";
+      //console.log("the claimed mimetype = " + file.mimetype);
+      if (file.mimetype == "image/jpeg" || file.mimetype == "image/pjpeg" || file.mimetype == "image/jpg") {
+        ext = ".jpg";
+      }
+      if (file.mimetype == "image/gif") {
+        ext = ".gif";
+      }      
+     if (file.mimetype == "image/x-ms-bmp" || file.mimetype == "image/bmp") {
+        ext = ".bmp";
+      }      
+     if (file.mimetype == "image/png") {
+        ext = ".png";
+      }      
+      cb(null, Date.now().toString()+ext);
     }
   })
-})
+});
 
 
 /*
