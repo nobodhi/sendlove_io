@@ -33,7 +33,7 @@ block content
 
 
   .row
-    .col-xs-12.col-md-8
+    .col-xs-12.col-md-10
       h3=mapLocations.name
 
     .col-xs-2
@@ -56,7 +56,7 @@ block content
       
       
   .row
-    .col-xs-10.col-md-8         
+    .col-xs-12.col-md-10         
       a(href=imagePath)
         img(class='img-thumbnail', title=mapLocations.name, src=imagePath+"?h=500&q=60&auto=format,enhance", id='theImage') 
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
@@ -70,7 +70,7 @@ block content
 
 
   .row
-    .col-xs-10.col-md-8
+    .col-xs-12.col-md-10
       form(role='form', method='POST') 
         br
         input(type='hidden', name='_csrf', value=_csrf)
@@ -89,16 +89,16 @@ block content
               | Send            
   
   .row
-    .col-xs-10.col-md-8
+    .col-xs-12.col-md-10
       h4 
         i Replies
       for comment in commentsArray
         .row
-          .col-xs-10.col-md-8
-            blockquote(style='white-space:pre-wrap;background: #f9f9f9;font-size: 1em;')=comment.description
+          .col-xs-12.col-md-10
+            blockquote(style='white-space:pre-wrap;background: #f9f9f9;')=comment.description
   
   .row
-    .col-xs-10.col-md-8
+    .col-xs-12.col-md-10
     hr 
     //- pre(id='allMetaDataSpan') 
 

@@ -268,7 +268,7 @@ exports.getIntention = (req, res) => {
         // set any variables 
         imagePath += request.body.imagePath;
         description = request.body.description;
-        shortDescription = request.body.description.substring(0,145) + "..";
+        shortDescription = '' ; // request.body.description.substring(0,145) + "..";
         latitude = request.body.latitude;
         longitude = request.body.longitude;
         title = request.body.name;
