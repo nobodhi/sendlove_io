@@ -74,6 +74,19 @@ $(function() {
   });
 });
 
+$(function() {
+  $('.reply-button').click(function() {
+  
+    if (typeof user != "undefined") {
+      // ok
+    }
+    else {
+      alert('login to reply!');
+      return false;
+    }
+  });
+});
+
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 11, // 13 is close
