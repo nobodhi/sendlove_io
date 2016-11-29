@@ -6,9 +6,7 @@ block content
       height: 60vh;
      
     }
-    pre {
-      white-space: pre-wrap;       /* Since CSS 2.1 */
-    }
+
 
   .page-header
     h2
@@ -33,7 +31,7 @@ block content
 
 
   .row
-    .col-xs-12.col-md-10
+    .col-xs-10.col-md-8
       h3=mapLocations.name
 
     .col-xs-2
@@ -54,23 +52,29 @@ block content
           img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")           
         //-|&nbsp;like      
       
-      
   .row
-    .col-xs-12.col-md-10         
+    .col-xs-10.col-md-8         
       a(href=imagePath)
         img(class='img-thumbnail', title=mapLocations.name, src=imagePath+"?h=500&q=60&auto=format,enhance", id='theImage') 
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
+      p
+      a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
   
   .row
     .col-xs-10.col-md-8
+      br
       #map
 
-      p
-      a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
-
+    .col-xs-4
+      br
+      br
+      i Join this intention!
+      script(src="http://www.charitynavigator.org/feeds/widgets/search.js" type="text/javascript")
+      blockquote(style='white-space:pre-wrap;font-size: 10px; ') attach a charity to this intention
+ 
 
   .row
-    .col-xs-12.col-md-10
+    .col-xs-10.col-md-8
       form(role='form', method='POST') 
         br
         input(type='hidden', name='_csrf', value=_csrf)
@@ -89,16 +93,19 @@ block content
               | Send            
   
   .row
-    .col-xs-12.col-md-10
+    .col-xs-10.col-md-8
       h4 
         i Replies
       for comment in commentsArray
         .row
           .col-xs-12.col-md-10
             blockquote(style='white-space:pre-wrap;background: #f9f9f9;')=comment.description
-  
+
+      
+
+            
   .row
-    .col-xs-12.col-md-10
+    .col-xs-10.col-md-8
     hr 
     //- pre(id='allMetaDataSpan') 
 
