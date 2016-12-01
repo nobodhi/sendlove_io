@@ -55,7 +55,7 @@ block content
   .row
     .col-xs-10.col-md-8         
       a(href=imagePath)
-        img(class='img-thumbnail', title=mapLocations.name, src=imagePath+"?h=500&q=60&auto=format,enhance", id='theImage') 
+        img(class='img-thumbnail', title=mapLocations.name, src=imagePath+"?h=500&auto=format,enhance&q=90", id='theImage') 
       blockquote(style='white-space:pre-wrap;')=mapLocations.description
       p
       a(href='/api/map?category=' + mapLocations.category) #{mapLocations.category} 
