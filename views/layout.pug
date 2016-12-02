@@ -21,11 +21,17 @@ html
     meta(property='og:image:width' content='400') 
     meta(property='og:image:height' content='300') 
 
-   
+    // Twitter Card data
+    meta(name='twitter:card' content='summary_large_image')
+    meta(name='twitter:site' content='@SendLoveIO')
+    meta(name='twitter:title' content=title)
+    meta(name='twitter:description' content=shortDescription)
+    meta(name='twitter:creator' content='@SendLoveIO')
+    meta(name='twitter:image:src' content=imagePath+'?w=800')
+    
     title #{title} - SendLove I/O
     link(rel='shortcut icon', href='/favicon.png')
     link(rel='stylesheet', href='/css/main.css')
-
     
     style.
       body {
@@ -38,10 +44,6 @@ html
   
       a { text-decoration: none; }
       a:hover { color: #F76F76; }    
-    
-    
-    
-    
     
     
   body
@@ -65,4 +67,3 @@ html
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
       ga('create', 'UA-83797479-1', 'auto');
       ga('send', 'pageview');
-  
