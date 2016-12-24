@@ -1,41 +1,46 @@
 doctype html
 html
   head
-    meta(charset='utf-8')
-    meta(http-equiv='X-UA-Compatible', content='IE=edge')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    meta(name='theme-color' content='#4DA5F4')
-    meta(name='csrf-token', content=_csrf)
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="theme-color" content="#4DA5F4")
+    meta(name="csrf-token", content=_csrf)
 
     // schema.org 
-    meta(itemprop='name', content=title)
-    meta(itemprop='description', content=shortDescription)
-    meta(itemprop='image', content=imagePath+'?w=800')
+    meta(itemprop="name", content=title)
+    meta(itemprop="description", content=shortDescription)
+    meta(itemprop="image", content=imagePath+"?w=800")
     
     // facebook og
-    meta(property='fb:app_id' content="571114529760069")
-    meta(property='og:url' content=shareUrl)
-    meta(property='og:title' content=title)
-    meta(property='og:description' content=shortDescription)
-    meta(property='og:image' content=imagePath+'?w=800')
-    meta(property='og:image:width' content='400') 
-    meta(property='og:image:height' content='300') 
+    meta(property="fb:app_id" content="571114529760069")
+    meta(property="og:url" content=shareUrl)
+    meta(property="og:title" content=title)
+    meta(property="og:description" content=shortDescription)
+    meta(property="og:image" content=imagePath+"?w=800")
+    meta(property="og:image:width" content="400") 
+    meta(property="og:image:height" content="300") 
 
     // Twitter Card data
-    meta(name='twitter:card' content='summary_large_image')
-    meta(name='twitter:site' content='@SendLoveIO')
-    meta(name='twitter:title' content=title)
-    meta(name='twitter:description' content=shortDescription)
-    meta(name='twitter:creator' content='@SendLoveIO')
-    meta(name='twitter:image:src' content=imagePath+'?w=800')
+    meta(name="twitter:card" content="summary_large_image")
+    meta(name="twitter:site" content="@SendLoveIO")
+    meta(name="twitter:title" content=title)
+    meta(name="twitter:description" content=shortDescription)
+    meta(name="twitter:creator" content="@SendLoveIO")
+    meta(name="twitter:image:src" content=imagePath+"?w=800")
     
     title #{title} - SendLove I/O
-    link(rel='shortcut icon', href='/favicon.png')
-    link(rel='stylesheet', href='/css/main.css')
+    link(rel="shortcut icon", href="/favicon.png")
+    link(rel="stylesheet", href="/css/main.css")
     
     style.
       body {
         font-size: 16px;
+        width: "100%"; 
+        height: "100%"; 
+        margin: "0px"; 
+        padding: "0px"; 
+        overflow-x: "hidden";
       }
   
       h1  { font-size: 22px; color: #464646; }
@@ -55,15 +60,15 @@ html
 
     include partials/footer
 
-    script(src='/js/lib/jquery-2.2.4.min.js')
-    script(src='/js/lib/bootstrap.min.js')
-    script(src='/js/main.js')
+    script(src="/js/lib/jquery-2.2.4.min.js")
+    script(src="/js/lib/bootstrap.min.js")
+    script(src="/js/main.js")
 
     // Google Analytics
     script.
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      ga('create', 'UA-83797479-1', 'auto');
-      ga('send', 'pageview');
+      })(window,document,"script","//www.google-analytics.com/analytics.js","ga");
+      ga("create", "UA-83797479-1", "auto");
+      ga("send", "pageview");
