@@ -5,6 +5,7 @@ const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
@@ -17,15 +18,15 @@ const passport = require('passport');
 const expressValidator = require('express-validator');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
-const uploadMulter = multer({ dest: path.join(__dirname, 'uploads') });
-const aws = require('aws-sdk')
-const multerS3 = require('multer-s3')
 
+// const uploadMulter = multer({dest: path.join(__dirname, 'uploads')});
+const aws = require('aws-sdk');
+const multerS3 = require('multer-s3');
 
 /*
   Load environment variables from .env file, where API keys and passwords are configured.
 */
-dotenv.load({ path: '.env.example' });
+dotenv.load({path: '.env.example'});
 
 /*
   Controllers (route handlers).
@@ -65,13 +66,12 @@ app.use(sass({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public')
 }));
-app.use("/uploads", express.static(__dirname + '/uploads'));
-
-
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.use(logger('dev'));
+app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressValidator());
 app.use(session({
   resave: true,
@@ -84,9 +84,13 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// try to log back in - session should be above remember-me
+app.use(passport.authenticate('remember-me'));
+
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload' || req.path === '/api/new_intention') { // TODO KLUDGE: CSRF multipart issue.
+  if (req.path === '/api/upload' || req.path === '/api/new_intention') { // TODO HACK: CSRF multipart issue.
     next();
   } else {
     lusca.csrf()(req, res, next);
@@ -98,7 +102,7 @@ app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
 });
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   // After successful login, redirect back to the intended page
   if (!req.user &&
       req.path !== '/login' &&
@@ -109,35 +113,34 @@ app.use(function(req, res, next) {
   }
   next();
 });
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-
-
+app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
 
 /*
  2016.11.27
- set up multer and S3. TODO validate size and type of file. 
-*/ 
-var s3 = new aws.S3({ /* ... */ }) // is this a var or a const?
+ set up multer and S3. TODO validate size and type of file.
+*/
+var s3 = new aws.S3({ /* ... */ }); // is this a var or a const?
 var uploadS3 = multer({
   storage: multerS3({
     s3: s3,
     bucket: process.env.S3_BUCKET,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: function (req, file, cb) {
-      var ext = "";
-      //console.log("the claimed mimetype = " + file.mimetype);
-      if (file.mimetype == "image/jpeg" || file.mimetype == "image/pjpeg" || file.mimetype == "image/jpg") {
-        ext = ".jpg";
+      let ext = '';
+
+      //console.log('the claimed mimetype = ' + file.mimetype);
+      if (file.mimetype === 'image/jpeg' || file.mimetype == 'image/pjpeg' || file.mimetype == 'image/jpg') {
+        ext = '.jpg';
       }
-      if (file.mimetype == "image/gif") {
-        ext = ".gif";
-      }      
-     if (file.mimetype == "image/x-ms-bmp" || file.mimetype == "image/bmp") {
-        ext = ".bmp";
-      }      
-     if (file.mimetype == "image/png") {
-        ext = ".png";
-      }      
+      if (file.mimetype === 'image/gif') {
+        ext = '.gif';
+      }
+     if (file.mimetype === 'image/x-ms-bmp' || file.mimetype == 'image/bmp') {
+        ext = '.bmp';
+      }
+     if (file.mimetype === 'image/png') {
+        ext = '.png';
+      }
       cb(null, Date.now().toString()+ext);
     }
   })
@@ -154,8 +157,9 @@ app.get('/privacy', function (req, res) {
   res.render('privacy', { title: 'Privacy Policy'});
 });
 
-// APP routes call the API functions by name.
+// LOGIN routes
 
+// GET
 app.get('/', apiController.getFeed); // homeController.index);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
@@ -165,7 +169,7 @@ app.get('/login', userController.getLogin);
 app.get('/logout', userController.logout);
 app.get('/reset/:token', userController.getReset);
 app.get('/signup', userController.getSignup);
-
+// POST
 app.post('/', homeController.postContact);
 app.post('/account/delete', passportConfig.isAuthenticated, userController.postDeleteAccount);
 app.post('/account/password', passportConfig.isAuthenticated, userController.postUpdatePassword);
@@ -176,10 +180,10 @@ app.post('/login', userController.postLogin);
 app.post('/reset/:token', userController.postReset);
 app.post('/signup', userController.postSignup);
 
-/*
-  API get routes. See passport.js for authentication and authorization functions
-*/
 
+// API routes
+
+// GET
 app.get('/api', apiController.getApi);
 app.get('/api/aviary', apiController.getAviary);
 app.get('/api/clockwork', apiController.getClockwork);
@@ -204,32 +208,32 @@ app.get('/api/tumblr', passportConfig.isAuthenticated, passportConfig.isAuthoriz
 app.get('/api/twilio', apiController.getTwilio);
 app.get('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getTwitter);
 app.get('/api/upload', apiController.getFileUpload);
-app.get('/api/new_intention', passportConfig.isAuthenticated, apiController.getNewIntention); 
-app.get('/api/intention/:token', apiController.getIntention); 
-app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage); 
-app.get('/api/map', apiController.getMap); 
-app.get('/api/feed', apiController.getFeed); 
-app.get('/api/testmap', apiController.getTestMap); 
+app.get('/api/new_intention', passportConfig.isAuthenticated, apiController.getNewIntention);
+app.get('/api/intention/:token', apiController.getIntention);
+app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage);
+app.get('/api/map', apiController.getMap);
+app.get('/api/feed', apiController.getFeed);
+app.get('/api/testmap', apiController.getTestMap);
 
-/*
-  API Post Routes
-*/
-app.post('/api/new_intention', passportConfig.isAuthenticated, uploadS3.array('imgFile'), apiController.postIntention); 
-app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postDetail); 
+// POST
+app.post('/api/new_intention', passportConfig.isAuthenticated, uploadS3.array('imgFile'), apiController.postIntention);
+app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postDetail);
 app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
 app.post('/api/intention', passportConfig.isAuthenticated, apiController.postDetail);
 app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
 
-// app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
-// app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
-// app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe);
-// app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
-// app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
-// app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('imgFile'), apiController.postFileUpload); 
+/*
+app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
+app.post('/api/pinterest', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postPinterest);
+app.post('/api/stripe', passportConfig.isAuthenticated, apiController.postStripe);
+app.post('/api/twilio', passportConfig.isAuthenticated, apiController.postTwilio);
+app.post('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.postTwitter);
+app.post('/api/upload', passportConfig.isAuthenticated, uploadMulter.single('imgFile'), apiController.postFileUpload);
+*/
 
 /*
   OAuth authentication routes. (Sign in)
-**/
+*/
 app.get('/auth/instagram', passport.authenticate('instagram'));
 app.get('/auth/instagram/callback', passport.authenticate('instagram', { failureRedirect: '/login' }), (req, res) => {
   res.redirect(req.session.returnTo || '/');

@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const utils = require('../config/utils');
 
 /*
   GET /login
@@ -24,8 +25,10 @@ exports.getLogin = (req, res) => {
 exports.postLogin = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
+  req.sanitize('email').normalizeEmail({remove_dots: false});
+  const rememberMe = req.body.rememberMe; // values will be 'on' or undefined
 
+  console.log(rememberMe);
   const errors = req.validationErrors();
 
   if (errors) {
@@ -34,14 +37,34 @@ exports.postLogin = (req, res, next) => {
   }
 
   passport.authenticate('local', (err, user, info) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     if (!user) {
       req.flash('errors', info);
       return res.redirect('/login');
     }
-    req.logIn(user, (err) => {
-      if (err) { return next(err); }
-      req.flash('success', { msg: 'Success! You are logged in.' });
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        return next(loginErr);
+      }
+
+      // set a cookie TODO something something
+
+      if (rememberMe !== undefined) {
+        req.flash('success', {msg: 'I should remember you'});
+
+        // call issueToken passing in a user and getting back a token
+
+        utils.issueToken(req.user, function (rememberErr, token) {
+          if (rememberErr) {
+            return next(rememberErr);
+          }
+          res.cookie('remember_me', token, {path: '/', httpOnly: true, maxAge: 604800000});
+          return next();
+        });
+      }
+      req.flash('success', {msg: 'Success! You are logged in.'});
       res.redirect(req.session.returnTo || '/');
     });
   })(req, res, next);
@@ -52,6 +75,8 @@ exports.postLogin = (req, res, next) => {
   Log out.
 */
 exports.logout = (req, res) => {
+  // TODO call utils function that deletes the userToken
+  res.clearCookie('remember_me');
   req.logout();
   res.redirect('/');
 };
@@ -77,7 +102,7 @@ exports.postSignup = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
+  req.sanitize('email').normalizeEmail({remove_dots: false});
 
   const errors = req.validationErrors();
 
@@ -91,16 +116,18 @@ exports.postSignup = (req, res, next) => {
     password: req.body.password
   });
 
-  User.findOne({ email: req.body.email }, (err, existingUser) => {
+  User.findOne({email: req.body.email}, (err, existingUser) => {
     if (existingUser) {
-      req.flash('errors', { msg: 'Account with that email address already exists.' });
+      req.flash('errors', {msg: 'Account with that email address already exists.'});
       return res.redirect('/signup');
     }
-    user.save((err) => {
-      if (err) { return next(err); }
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
+    user.save((saveErr) => {
+      if (saveErr) {
+        return next(saveErr);
+      }
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          return next(loginErr);
         }
         res.redirect('/');
       });
@@ -124,7 +151,7 @@ exports.getAccount = (req, res) => {
 */
 exports.postUpdateProfile = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
+  req.sanitize('email').normalizeEmail({remove_dots: false});
 
   const errors = req.validationErrors();
 
@@ -134,21 +161,25 @@ exports.postUpdateProfile = (req, res, next) => {
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     user.email = req.body.email || '';
     user.profile.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
-    user.save((err) => {
-      if (err) {
-        if (err.code === 11000) {
-          req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
+    user.save((nextErr) => {
+      if (nextErr) {
+        if (nextErr.code === 11000) {
+          req.flash('errors', {
+            msg: 'The email address you have entered is already associated with an account.'
+          });
           return res.redirect('/account');
         }
-        return next(err);
+        return next(nextErr);
       }
-      req.flash('success', { msg: 'Profile information has been updated.' });
+      req.flash('success', {msg: 'Profile information has been updated.'});
       res.redirect('/account');
     });
   });
@@ -170,11 +201,15 @@ exports.postUpdatePassword = (req, res, next) => {
   }
 
   User.findById(req.user.id, (err, user) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     user.password = req.body.password;
-    user.save((err) => {
-      if (err) { return next(err); }
-      req.flash('success', { msg: 'Password has been changed.' });
+    user.save((nextErr) => {
+      if (nextErr) {
+        return next(nextErr);
+      }
+      req.flash('success', {msg: 'Password has been changed.'});
       res.redirect('/account');
     });
   });
@@ -185,10 +220,12 @@ exports.postUpdatePassword = (req, res, next) => {
   Delete user account.
 */
 exports.postDeleteAccount = (req, res, next) => {
-  User.remove({ _id: req.user.id }, (err) => {
-    if (err) { return next(err); }
+  User.remove({_id: req.user.id}, (err) => {
+    if (err) {
+      return next(err);
+    }
     req.logout();
-    req.flash('info', { msg: 'Your account has been deleted.' });
+    req.flash('info', {msg: 'Your account has been deleted.'});
     res.redirect('/');
   });
 };
@@ -199,13 +236,18 @@ exports.postDeleteAccount = (req, res, next) => {
 */
 exports.getOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
+
   User.findById(req.user.id, (err, user) => {
-    if (err) { return next(err); }
+    if (err) {
+      return next(err);
+    }
     user[provider] = undefined;
     user.tokens = user.tokens.filter(token => token.kind !== provider);
-    user.save((err) => {
-      if (err) { return next(err); }
-      req.flash('info', { msg: `${provider} account has been unlinked.` });
+    user.save((nextErr) => {
+      if (nextErr) {
+        return next(nextErr);
+      }
+      req.flash('info', {msg: `${provider} account has been unlinked.`});
       res.redirect('/account');
     });
   });
@@ -220,12 +262,16 @@ exports.getReset = (req, res, next) => {
     return res.redirect('/');
   }
   User
-    .findOne({ passwordResetToken: req.params.token })
+    .findOne({passwordResetToken: req.params.token})
     .where('passwordResetExpires').gt(Date.now())
     .exec((err, user) => {
-      if (err) { return next(err); }
+      if (err) {
+        return next(err);
+      }
       if (!user) {
-        req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+        req.flash('errors', {
+          msg: 'Password reset token is invalid or has expired.'
+        });
         return res.redirect('/forgot');
       }
       res.render('account/reset', {
@@ -252,21 +298,25 @@ exports.postReset = (req, res, next) => {
   async.waterfall([
     function (done) {
       User
-        .findOne({ passwordResetToken: req.params.token })
+        .findOne({passwordResetToken: req.params.token})
         .where('passwordResetExpires').gt(Date.now())
         .exec((err, user) => {
-          if (err) { return next(err); }
+          if (err) {
+            return next(err);
+          }
           if (!user) {
-            req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
+            req.flash('errors', {msg: 'Password reset token is invalid or has expired.'});
             return res.redirect('back');
           }
           user.password = req.body.password;
           user.passwordResetToken = undefined;
           user.passwordResetExpires = undefined;
-          user.save((err) => {
-            if (err) { return next(err); }
-            req.logIn(user, (err) => {
-              done(err, user);
+          user.save((saveErr) => {
+            if (saveErr) {
+              return next(saveErr);
+            }
+            req.logIn(user, (loginErr) => {
+              done(loginErr, user);
             });
           });
         });
@@ -283,10 +333,12 @@ exports.postReset = (req, res, next) => {
         to: user.email,
         from: 'sendlove.io@sendgrid.net',
         subject: 'Your SendLove.io password has been changed',
-        text: `Hello,\n\nThis is a confirmation that the password for your account ${user.email} has just been changed.\n`
+        text: `Hello,\n\n
+        This is a confirmation that the password for your account ${user.email} has just been changed.\n`
       };
+
       transporter.sendMail(mailOptions, (err) => {
-        req.flash('success', { msg: 'Success! Your password has been changed.' });
+        req.flash('success', {msg: 'Success! Your password has been changed.'});
         done(err);
       });
     }
@@ -356,13 +408,15 @@ exports.postForgot = (req, res, next) => {
         to: user.email,
         from: 'sendlove.io@sendgrid.net',
         subject: 'Reset your password on SendLove.io',
-        text: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+        text: `You are receiving this email because you (or someone else) have requested
+          the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
           http://${req.headers.host}/reset/${token}\n\n
           If you did not request this, please ignore this email and your password will remain unchanged.\n`
       };
+
       transporter.sendMail(mailOptions, (err) => {
-        req.flash('info', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
+        req.flash('info', {msg: `An e-mail has been sent to ${user.email} with further instructions.`});
         done(err);
       });
     }

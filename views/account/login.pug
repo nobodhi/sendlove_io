@@ -19,13 +19,18 @@ block content
           i.fa.fa-user
           | Login
         a.btn.btn-link(href='/forgot') Forgot your password?
+      .col-sm-offset-3.col-sm-7
+        .checkbox
+          label
+          input(type='checkbox', name='rememberMe')
+          | Remember me
 
     .form-group
       .col-sm-offset-3.col-sm-7
         hr
-        p Don't have an account? 
-          a.btn.btn-link(href='/signup') 
-            b Sign up!      
+        p Don't have an account?
+          a.btn.btn-link(href='/signup')
+            b Sign up!
         hr
     .form-group
       .col-sm-offset-3.col-sm-7

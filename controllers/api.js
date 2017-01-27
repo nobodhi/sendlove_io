@@ -1,8 +1,7 @@
-'use strict';
-const util = require('util');
-const _ = require('lodash');
+// const util = require('util');
+// const _ = require('lodash');
 const async = require('async');
-const validator = require('validator');
+// const validator = require('validator');
 const request = require('request');
 const cheerio = require('cheerio');
 const graph = require('fbgraph');
@@ -13,7 +12,7 @@ const Twit = require('twit');
 const stripe = require('stripe')(process.env.STRIPE_SKEY);
 const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 const Linkedin = require('node-linkedin')(process.env.LINKEDIN_ID, process.env.LINKEDIN_SECRET, process.env.LINKEDIN_CALLBACK_URL);
-const clockwork = require('clockwork')({ key: process.env.CLOCKWORK_KEY });
+const clockwork = require('clockwork')({key: process.env.CLOCKWORK_KEY});
 const paypal = require('paypal-rest-sdk');
 const lob = require('lob')(process.env.LOB_KEY);
 const ig = require('instagram-node').instagram();
@@ -24,13 +23,6 @@ const foursquare = require('node-foursquare')({
     redirectUrl: process.env.FOURSQUARE_REDIRECT_URL
   }
 });
-
-// var cloudinary = require('cloudinary');
-// cloudinary.config({ 
-//   cloud_name: process.env.CLOUDINARY_NAME, 
-//   api_key: process.env.CLOUDINARY_KEY, 
-//   api_secret: process.env.CLOUDINARY_SECRET 
-// });
 
 // APP routes call the API functions by name.
 
@@ -45,35 +37,30 @@ exports.getApi = (req, res) => {
 };
 
 
-
 /*
   GET /api/new_intention
   for posting a new intention
 */
 exports.getNewIntention = (req, res) => {
-  var latitude;
-  var longitude;
-  const shareUrl = "http://" + req.hostname + "/api/map";
-
+  const latitude = 0;
+  const longitude = 0;
+  const shareUrl = `http:// ${req.hostname} /api/map`;
 
   res.render('api/new_intention', {
     title: 'New Intention',
     latitude,
     longitude,
     mapKey: process.env.GOOGLE_MAPS_KEY,
-    shareUrl: shareUrl
-    //cloudinary_cors: cloudinary_cors,
-    //image_upload_tag: image_upload_tag
+    shareUrl
   });
-}
+};
 
 
 /*
   POST /api/detail
-  Create a new detail on api.sendlove.io Question. do we return to intention/:id? or simply not return?
-  
-  TODO redirect simply to the page that you came from
-  
+  Create a new detail on api.sendlove.io
+  TODO redirect simply to the page that you came from(?)
+  TODO
 */
 exports.postDetail = (req, res, next) => {
   var thingId = req.body.thingId;
@@ -92,7 +79,7 @@ exports.postDetail = (req, res, next) => {
   const postUrl = process.env.API_URL + '/part'
   if (partType == 'comment') {
     var formData = {
-      thingId: thingId, 
+      thingId: thingId,
       personId: req.user._id,
       partType: partType,
       description: description
@@ -100,13 +87,13 @@ exports.postDetail = (req, res, next) => {
   }
   else { // default to 'like'
     var formData = {
-      thingId: thingId, 
+      thingId: thingId,
       personId: req.user._id,
       partType: partType,
       nValue: 1 // TODO pass as parameter > 1
     }
   }
-  var jsonData = JSON.stringify(formData); 
+  var jsonData = JSON.stringify(formData);
   //console.log(formData);
   //console.log(jsonData);
   request({
@@ -121,8 +108,9 @@ exports.postDetail = (req, res, next) => {
     ,(err, request, body) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
-      if (request.statusCode !==200) {
-        req.flash('errors', { msg: "An error occured with status code " + request.statusCode  }); // todo pass json error msg from api?
+      if (request.statusCode !== 200) {
+        req.flash('errors', {msg: `An error occured with status code ${request.statusCode}`});
+        // TODO pass json error msg from api?
         res.redirect('/api/intention/' + thingId);
         //return res.send();
       }
@@ -131,7 +119,7 @@ exports.postDetail = (req, res, next) => {
       }
       else  {
         return res.send();
-      }  
+      }
     }
   );
 }
@@ -143,36 +131,36 @@ exports.postDetail = (req, res, next) => {
 */
 exports.postIntention = (req, res, next) => {
 
-  
+
   var latitude = req.body.latitude;
   var longitude = req.body.longitude;
 
-  
+
   //console.log(util.inspect(req, false, null));
 
   /*
   valide the data entered by the user. TODO - go back and delete the image,
   or never upload it in the first place, if it's a bad file.
   */
-  
+
   if ( isNaN(latitude) || isNaN(longitude) ) {
     req.flash('errors', { msg: "please include a location :) " });
     return res.redirect('/api/new_intention');
   }
-    
-  var newImage = req.files[0].key; 
+
+  var newImage = req.files[0].key;
   //var mimeTypeClaimed = req.files[0].mimetype.toString();
   var mimeTypeActual = req.files[0].contentType.toString(); // contentType is a metadata set in multerS3
   if (!mimeTypeActual.startsWith("image/")) {
     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
     return res.redirect('/api/new_intention');
   }
-  
+
   var fileSize = req.files[0].size;
   if (fileSize > 10000000) {
     req.flash('errors', { msg: "Please upload an image smaller than 10 megs :) " });
     return res.redirect('/api/new_intention');
-  }  
+  }
 
   // TODO delete bad file USING AWS-SDK
 
@@ -182,7 +170,7 @@ exports.postIntention = (req, res, next) => {
     req.flash('errors', errors);
     return res.redirect('/api/new_intention');
   }
-  
+
 
   // set API post url, and process form
   const postUrl = process.env.API_URL + '/thing';
@@ -195,7 +183,7 @@ exports.postIntention = (req, res, next) => {
     imagePath: newImage,
     category: req.body.category
   }
-  var jsonData = JSON.stringify(formData); 
+  var jsonData = JSON.stringify(formData);
   console.log(formData);
   console.log(postUrl);
   request({
@@ -229,7 +217,7 @@ exports.getIntention = (req, res) => {
   const getUrl = process.env.API_URL + '/thing/' + token;
   var getPartsUrl = process.env.API_URL + '/part';
   const mapKey = process.env.GOOGLE_MAPS_KEY;
-  var latitude ; 
+  var latitude ;
   var longitude ;
   var intention;
   var title ='intention';
@@ -246,15 +234,15 @@ exports.getIntention = (req, res) => {
 
   // set personId
   if (req.user != undefined) {
-    console.log("logged in, setting async");
+    // console.log("logged in, setting async");
     personId = req.user._id;
     personId = JSON.stringify(personId);
-    personId = personId.replace(/"/g,""); // KLUDGE
+    personId = personId.replace(/"/g,""); // HACK
     queryString['personId']  = personId;
     console.log("personId = " + personId);
   }
   else {
-    console.log("not logged in, skipping personId");
+    // console.log("not logged in, skipping personId");
   }
 
 
@@ -265,7 +253,7 @@ exports.getIntention = (req, res) => {
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
-        // set any variables 
+        // set any variables
         imagePath += request.body.imagePath;
         description = request.body.description;
         try {
@@ -278,7 +266,7 @@ exports.getIntention = (req, res) => {
         latitude = request.body.latitude;
         longitude = request.body.longitude;
         title = request.body.name;
-        done(err, body); 
+        done(err, body);
       });
     },
     getLikes: (done) => {
@@ -288,8 +276,8 @@ exports.getIntention = (req, res) => {
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
-        // set any variables 
-        done(err, body); 
+        // set any variables
+        done(err, body);
       });
     },
     getComments: (done) => {
@@ -300,8 +288,8 @@ exports.getIntention = (req, res) => {
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
-        // set any variables 
-        done(err, body); 
+        // set any variables
+        done(err, body);
       });
     }
 
@@ -336,7 +324,7 @@ exports.getTestMap = (req, res, next) => {
   const getUrl = process.env.API_URL + '/thing/' + token;
   var getPartsUrl = process.env.API_URL + '/part';
   const mapKey = process.env.GOOGLE_MAPS_KEY;
-  var latitude ; 
+  var latitude ;
   var longitude ;
   var intention;
   var title ='intention';
@@ -353,10 +341,10 @@ exports.getTestMap = (req, res, next) => {
 
   // set personId
   if (req.user != undefined) {
-    console.log("logged in, setting async");
+    // console.log("logged in, setting async");
     personId = req.user._id;
     personId = JSON.stringify(personId);
-    personId = personId.replace(/"/g,""); // KLUDGE
+    personId = personId.replace(/"/g,""); // HACK
     queryString['personId']  = personId;
     console.log("personId = " + personId);
   }
@@ -372,14 +360,14 @@ exports.getTestMap = (req, res, next) => {
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
-        // set any variables 
+        // set any variables
         imagePath += request.body.imagePath;
         description = request.body.description;
         shortDescription = request.body.description.substring(0,145) + "..";
         latitude = request.body.latitude;
         longitude = request.body.longitude;
         title = request.body.name;
-        done(err, body); 
+        done(err, body);
       });
     },
     getLikes: (done) => {
@@ -389,8 +377,8 @@ exports.getTestMap = (req, res, next) => {
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
-        // set any variables 
-        done(err, body); 
+        // set any variables
+        done(err, body);
       });
     },
     getComments: (done) => {
@@ -401,8 +389,8 @@ exports.getTestMap = (req, res, next) => {
         if (request.statusCode !==200) {
           req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
         }
-        // set any variables 
-        done(err, body); 
+        // set any variables
+        done(err, body);
       });
     }
 
@@ -441,18 +429,18 @@ exports.postTestMap = (req, res) => {
 
 /*
   GET /api/map
-  display the map 
+  display the map
 */
  exports.getMap = (req, res, next) => {
- 
+
   var getUrl = process.env.API_URL + '/thing';
-  var latitude; 
+  var latitude;
   var longitude;
   var mapKey;
   var mapLocations;
-  var imagePath = "http://sendloveio.imgix.net/"; 
-  var shareUrl = "http://" + req.hostname + '/api/map/' 
-  
+  var imagePath = "http://sendloveio.imgix.net/";
+  var shareUrl = "http://" + req.hostname + '/api/map/'
+
   if (req.query.category != undefined) {
     getUrl += '/?category=' + req.query.category;
   }
@@ -469,22 +457,22 @@ exports.postTestMap = (req, res) => {
     ,(err, request, body) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
-      
+
       if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
 
       if (mapLocations.length > 0) {
-        imagePath += mapLocations[mapLocations.length-1].imagePath; 
+        imagePath += mapLocations[mapLocations.length-1].imagePath;
       }
       else {
         imagePath += 'globe.gif';
       }
-      
+
       res.render('api/map', {
         title: 'Map',
-        shortDescription: 'Set your intention today on SendLove.io.',       
+        shortDescription: 'Set your intention today on SendLove.io.',
         latitude,
         longitude,
         mapKey: process.env.GOOGLE_MAPS_KEY,
@@ -499,19 +487,19 @@ exports.postTestMap = (req, res) => {
 
 /*
   GET /api/feed
-  display the feed 
+  display the feed
 */
  exports.getFeed = (req, res, next) => {
- 
+
   var getUrl = process.env.API_URL + '/thing';
-  var latitude; 
+  var latitude;
   var longitude;
   var feedKey;
   var mapLocations;
   var imagePath = "http://sendloveio.imgix.net/";
-  var shareUrl = "http://" + req.hostname + '/api/feed/' 
+  var shareUrl = "http://" + req.hostname + '/api/feed/'
   var title = "world of intentions"
-  
+
   if (req.query.category != undefined) {
     getUrl += '/?category=' + req.query.category;
   }
@@ -528,22 +516,22 @@ exports.postTestMap = (req, res) => {
     ,(err, request, body) => {
       // `body` is a js object if request was successful
       if (err) { return next(err); }
-      
+
       if (request.statusCode !==200) {
         req.flash('errors', { msg: "An error occured with status code " + request.statusCode + ": " + request.body.message });
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
 
       if (mapLocations.length > 0) {
-        imagePath += mapLocations[mapLocations.length-1].imagePath; 
+        imagePath += mapLocations[mapLocations.length-1].imagePath;
       }
       else {
         imagePath += 'globe.gif';
       }
-      
+
       res.render('api/feed', {
         title: title,
-        shortDescription: 'Set your intention today on SendLove.io.',       
+        shortDescription: 'Set your intention today on SendLove.io.',
         latitude,
         longitude,
         mapLocations: mapLocations,
@@ -553,8 +541,6 @@ exports.postTestMap = (req, res) => {
     }
   );
 }
-
-
 
 /*
   GET /api/message
@@ -587,9 +573,9 @@ exports.postMessage = (req, res, next) => {
     to: req.body.telephone,
     from: '+16233350027', // TODO - Allow multiple numbers to by dynamically set by business logic
     body: req.body.message + " - " + shareUrl
-  }; 
+  };
   // todo MediaUrl, MessagingServiceSid
-  
+
   twilio.sendMessage(message, (err, responseData) => {
     if (err) { return next(err.message); }
     req.flash('success', { msg: `Text sent to ${responseData.to}.` });
@@ -623,31 +609,31 @@ exports.getGoodNews = (req, res, next) => {
           const $ = cheerio.load(body);
           $('.title a[href^="http"]').each((index, element) => {
             links.push($(element));
-            
+
           });
           done(err, links);
         });
-      }, 
+      },
 //       getHP: (done) => {
 //         request.get('http://www.huffingtonpost.com/section/good-news', (err, request, body) => {
 //           const $ = cheerio.load(body);
 //           $('.card__headlines a[href^="http"]').each((index, element) => {
 //             links_hp.push($(element));
-//             
+//
 //           });
 //           done(err, links_hp);
 //         });
-//       }, 
+//       },
       getGN: (done) => {
         request.get('http://www.goodnewsnetwork.org/', (err, request, body) => {
           const $ = cheerio.load(body);
           $('.entry-title a[href^="http"]').each((index, element) => {
             links_gn.push($(element));
-            
+
           });
           done(err, links_gn);
         });
-      } 
+      }
     },
     (err, results) => {
       if (err)  { return next(err); }
@@ -668,7 +654,7 @@ exports.getGoodNews = (req, res, next) => {
   GET /api/upload
   File Upload API example.
 */
- 
+
 exports.getFileUpload = (req, res, next) => {
 
 
@@ -835,7 +821,7 @@ exports.getNewYorkTimes = (req, res, next) => {
     if (request.statusCode === 403) {
       return next(new Error('Invalid New York Times API Key'));
     }
-    const books = JSON.parse(body).results; 
+    const books = JSON.parse(body).results;
     res.render('api/nyt', {
       title: 'New York Times API',
       books
@@ -1032,7 +1018,7 @@ exports.postStripe = (req, res) => {
 
 /*
   GET /api/
-  
+
   Twilio API example.
 */
 exports.getTwilio = (req, res) => {
@@ -1085,7 +1071,7 @@ exports.getClockwork = (req, res) => {
 exports.postClockwork = (req, res, next) => {
   const message = {
     To: req.body.telephone,
-    From: 'SendLove.io',  
+    From: 'SendLove.io',
     Content: req.body.message
   };
   clockwork.sendSms(message, (err, responseData) => {
