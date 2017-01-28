@@ -14,39 +14,38 @@ const OAuthStrategy = require('passport-oauth').OAuthStrategy;
 const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 const User = require('../models/User');
 const utils = require('./utils');
+const UserCookie = require('../models/UserCookie');
 
 /*
-  Remember Me cookie strategy
-  This strategy consumes a remember me token, returning the corresponding uid.
-  consume gets called automagically on initial session load, and after logout.
+  Remember Me cookie strategy is only called in a new session if the remember_me cookie exists
 */
 passport.use(new RememberMeStrategy(
   function (token, done) {
-    console.log('in RememberMeStrategy');
-    utils.consumeRememberMeToken(token, function (err, uid) {
-      if (err) {
-        return done(err);
-      }
-      if (!uid) {
-        console.log('consume did not return a user');
-        return done(null, false);
-      }
-      console.log(`the user is ${uid}`); // note this is just returning a uid not a user
+    let uid = '';
 
-      User.findById(uid, function (findErr, user) {
-        if (findErr) {
-          return done(findErr);
-        }
-        if (!user) {
-          console.log('however, the user object does not exist');
-          return done(null, false);
-        }
-        console.log(`findById found user ${user}`);
-        return done(null, user);
-      });
+    // console.log(`in RememberMeStrategy, looking for cookieToken= ${token}`);
+    UserCookie.findOne({cookieToken: token.toString()}, (err, existingCookie) => {
+      if (existingCookie) {
+        uid = existingCookie.uid.toString();
+        // console.log(`found an existing cookie for uid= ${uid}`);
+        User.findById(uid, function (findErr, user) {
+          if (findErr) {
+            return done(findErr);
+          }
+          if (!user) {
+            // console.log('however, findById failed to locate a user');
+            return done(null, false);
+          }
+          // console.log(`findById found user ${user}`);
+          return done(null, user);
+        });
+      } else {
+        // console.log('did not find an existing cookie, the user cannot be logged in');
+      }
     });
+
   },
-  utils.issueToken // if the user doesn't exist, this does nothing?
+  utils.issueToken // if user exists, issue a token
 ));
 
 

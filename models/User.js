@@ -59,7 +59,7 @@ userSchema.methods.comparePassword = function (candidatePassword, cb) {
 };
 
 /*
- * Helper method for getting user's gravatar.
+ * Helper method for getting user's gravatar. 
 */
 userSchema.methods.gravatar = function (size) {
   let imageSize = size;

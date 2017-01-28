@@ -27,8 +27,6 @@ exports.postLogin = (req, res, next) => {
   req.assert('password', 'Password cannot be blank').notEmpty();
   req.sanitize('email').normalizeEmail({remove_dots: false});
   const rememberMe = req.body.rememberMe; // values will be 'on' or undefined
-
-  console.log(rememberMe);
   const errors = req.validationErrors();
 
   if (errors) {
@@ -44,23 +42,21 @@ exports.postLogin = (req, res, next) => {
       req.flash('errors', info);
       return res.redirect('/login');
     }
-    req.logIn(user, (loginErr) => {
+    req.logIn(user, (loginErr) => { // http://passportjs.org/docs/login
       if (loginErr) {
         return next(loginErr);
       }
 
-      // set a cookie TODO something something
-
+      // set a cookie
       if (rememberMe !== undefined) {
-        req.flash('success', {msg: 'I should remember you'});
-
-        // call issueToken passing in a user and getting back a token
-
+        // pass in a user and get back a token
         utils.issueToken(req.user, function (rememberErr, token) {
+          const maxAge = utils.getMaxAge(); // TODO return maxAge from issueToken
+
           if (rememberErr) {
             return next(rememberErr);
           }
-          res.cookie('remember_me', token, {path: '/', httpOnly: true, maxAge: 604800000});
+          res.cookie('remember_me', token, {path: '/', httpOnly: true, maxAge});
           return next();
         });
       }
@@ -121,7 +117,7 @@ exports.postSignup = (req, res, next) => {
       req.flash('errors', {msg: 'Account with that email address already exists.'});
       return res.redirect('/signup');
     }
-    user.save((saveErr) => {
+    user.save((saveErr) => { // create a new user
       if (saveErr) {
         return next(saveErr);
       }
@@ -169,7 +165,7 @@ exports.postUpdateProfile = (req, res, next) => {
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
-    user.save((nextErr) => {
+    user.save((nextErr) => { // update an existing user
       if (nextErr) {
         if (nextErr.code === 11000) {
           req.flash('errors', {
@@ -205,7 +201,7 @@ exports.postUpdatePassword = (req, res, next) => {
       return next(err);
     }
     user.password = req.body.password;
-    user.save((nextErr) => {
+    user.save((nextErr) => { // update a user password
       if (nextErr) {
         return next(nextErr);
       }
@@ -384,7 +380,7 @@ exports.postForgot = (req, res, next) => {
       });
     },
     function (token, done) {
-      User.findOne({ email: req.body.email }, (err, user) => {
+      User.findOne({email: req.body.email}, (err, user) => {
         if (!user) {
           req.flash('errors', { msg: 'Account with that email address does not exist.' });
           return res.redirect('/forgot');
