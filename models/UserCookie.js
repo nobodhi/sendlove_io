@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userCookieSchema = new mongoose.Schema({
-  uid: {type: String, unique: true},
+  uid: String,
   cookieToken: String,
   cookieExpires: Date
 },

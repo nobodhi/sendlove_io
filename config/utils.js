@@ -4,33 +4,30 @@ const UserCookie = require('../models/UserCookie');
 // var tokens = [];
 
 exports.getMaxAge = function () {
-  const maxAge = 1000 * 60 * 60 * 24 * 14;
+  const maxAge = 1000 * 60 * 60 * 24 * 7; // one week
 
   return maxAge;
 };
 
 /*
- consume a remember_me token: if found returns a uid
+  remove a UserCookie by uid - only call this from a user session object
 */
-exports.consumeRememberMeToken = function (cookieToken, fn) {
-  let uid = '';
-
-  // console.log(`in consumeRememberMeToken, looking for cookieToken= ${cookieToken}`);
-  UserCookie.findOne({cookieToken: cookieToken.toString()}, (err, existingCookie) => {
-    if (existingCookie) {
-      uid = existingCookie.uid;
-      // console.log(`found an existing cookie for uid= ${uid}`);
-    } else {
-      // console.log('did not find an existing cookie, the user cannot be logged in');
+exports.deleteToken = function (uid, cookieToken, done) {
+  console.log('delete the user object');
+  UserCookie.findOne({uid, cookieToken}, (err, userCookie) => {
+    if (err) {
+      return done(err);
+    }
+    if (userCookie) {
+      userCookie.remove();
     }
   });
-  return fn(null, uid);
+  // TODO return done(null, false)?
 };
 
 /*
  issues a new token. called from passport.js in RememberMeStrategy and from user.js in login
- TODO what if a hacker just passes a new token for the given uid?
-*/
+ */
 exports.issueToken = function (user, done) {
   const cookieToken = randomString(64);
 
@@ -42,30 +39,25 @@ exports.issueToken = function (user, done) {
   });
 };
 
-// can only be called from issueToken, in the context of a user. we create the token and insert it simultaneously.
+/*
+  only called from issueToken, in the context of a user. we create the token and insert it simultaneously.
+  (node:12936) DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is deprecated,
+  plug in your own promise library instead: http://mongoosejs.com/docs/promises.html
+*/
 function saveRememberMeToken (cookieToken, uid, fn) {
   console.log('in saveRememberMeToken');
-  const maxAge = utils.getMaxAge();
-  const milliseconds = new Date().getTime() + maxAge;
-  const cookieExpires = new Date(milliseconds);
-
-  // console.log(`maxAge= ${maxAge}`);
-  // console.log(`milliseconds= ${milliseconds}`);
-  // console.log(`cookieExpires= ${cookieExpires}`);
-
-  // if the uid exists attempt to overwrite. do not use upsert so that our middleware fires.
-  UserCookie.findOne({uid}, (err, existingCookie) => {
+  UserCookie.findOne({uid, cookieToken}, (err, existingCookie) => {
     if (existingCookie) {
-      // console.log('found an existing cookie, attempting to update');
-      existingCookie.cookieToken = cookieToken;
-      existingCookie.save((saveErr) => {
-        if (saveErr) {
-         console.log(saveErr);
-        }
-     });
-    //  console.log('existing cookie should now be saved');
+    console.log('warning: saveRememberMeToken found an existing cookie');
     } else {
-      // console.log('did not find an existing cookie, attempting to insert');
+      console.log('inserting new cookie record');
+      const maxAge = utils.getMaxAge();
+      const milliseconds = new Date().getTime() + maxAge;
+      const cookieExpires = new Date(milliseconds);
+
+      // console.log(`maxAge= ${maxAge}`);
+      // console.log(`milliseconds= ${milliseconds}`);
+      // console.log(`cookieExpires= ${cookieExpires}`);
       const userCookie = new UserCookie({
        uid,
        cookieToken,
@@ -76,7 +68,6 @@ function saveRememberMeToken (cookieToken, uid, fn) {
        if (saveErr) {
          console.log(saveErr);
        }
-      //  console.log('the cookie has supposedly been saved to the database');
       });
     }
   });

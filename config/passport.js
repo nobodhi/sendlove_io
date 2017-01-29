@@ -18,29 +18,32 @@ const UserCookie = require('../models/UserCookie');
 
 /*
   Remember Me cookie strategy is only called in a new session if the remember_me cookie exists
+  single-use: the strategy creates a new cookie and updates the model automatically, so you should
+  delete the previous cookie from the model (or it just sits there)
 */
 passport.use(new RememberMeStrategy(
   function (token, done) {
     let uid = '';
 
-    // console.log(`in RememberMeStrategy, looking for cookieToken= ${token}`);
+    console.log(`in RememberMeStrategy, looking for cookieToken= ${token}`);
     UserCookie.findOne({cookieToken: token.toString()}, (err, existingCookie) => {
       if (existingCookie) {
         uid = existingCookie.uid.toString();
-        // console.log(`found an existing cookie for uid= ${uid}`);
+        existingCookie.remove(); // single-use
+        console.log(`removed cookie record for uid= ${uid}`);
         User.findById(uid, function (findErr, user) {
           if (findErr) {
             return done(findErr);
           }
           if (!user) {
-            // console.log('however, findById failed to locate a user');
+            console.log('warning! failed to locate uid');
             return done(null, false);
           }
-          // console.log(`findById found user ${user}`);
+          console.log(`found user ${user.id}`);
           return done(null, user);
         });
       } else {
-        // console.log('did not find an existing cookie, the user cannot be logged in');
+        console.log('did not find an existing cookie, the user cannot be logged in');
       }
     });
 

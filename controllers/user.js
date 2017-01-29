@@ -72,6 +72,10 @@ exports.postLogin = (req, res, next) => {
 */
 exports.logout = (req, res) => {
   // TODO call utils function that deletes the userToken
+  if (req.user) {
+    utils.deleteToken(req.user.id, req.cookies.remember_me);
+    console.log(`logging out user ${req.user.id}`);
+  }
   res.clearCookie('remember_me');
   req.logout();
   res.redirect('/');
