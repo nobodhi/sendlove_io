@@ -1,3 +1,5 @@
+"use strict";
+
 const utils = require('./utils'); // HACK need access to export function
 const UserCookie = require('../models/UserCookie');
 
