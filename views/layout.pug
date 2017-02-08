@@ -7,19 +7,19 @@ html
     meta(name="theme-color" content="#4DA5F4")
     meta(name="csrf-token", content=_csrf)
 
-    // schema.org 
+    // schema.org
     meta(itemprop="name", content=title)
     meta(itemprop="description", content=shortDescription)
     meta(itemprop="image", content=imagePath+"?w=800")
-    
+
     // facebook og
     meta(property="fb:app_id" content="571114529760069")
     meta(property="og:url" content=shareUrl)
     meta(property="og:title" content=title)
     meta(property="og:description" content=shortDescription)
     meta(property="og:image" content=imagePath+"?w=800")
-    meta(property="og:image:width" content="400") 
-    meta(property="og:image:height" content="300") 
+    meta(property="og:image:width" content="400")
+    meta(property="og:image:height" content="300")
 
     // Twitter Card data
     meta(name="twitter:card" content="summary_large_image")
@@ -28,29 +28,29 @@ html
     meta(name="twitter:description" content=shortDescription)
     meta(name="twitter:creator" content="@SendLoveIO")
     meta(name="twitter:image:src" content=imagePath+"?w=800")
-    
-    title #{title} - SendLove I/O
+
+    title #{title}
     link(rel="shortcut icon", href="/favicon.png")
     link(rel="stylesheet", href="/css/main.css")
-    
+
     style.
       body {
         font-size: 16px;
-        width: "100%"; 
-        height: "100%"; 
-        margin: "0px"; 
-        padding: "0px"; 
+        width: "100%";
+        height: "100%";
+        margin: "0px";
+        padding: "0px";
         overflow-x: "hidden";
       }
-  
+
       h1  { font-size: 22px; color: #464646; }
       h2 { font-size: 20px; }
       h3 { font-size: 18px; }
-  
+
       a { text-decoration: none; }
-      a:hover { color: #F76F76; }    
-    
-    
+      a:hover { color: #F76F76; }
+
+
   body
     include partials/header
 

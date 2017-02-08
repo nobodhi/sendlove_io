@@ -24,7 +24,7 @@ function getExif() {
 $(function() {
   $('.like-button').click(function() {
     //event.preventDefault();
-  
+
     if (typeof user != "undefined") {
       // handle ui
       var obj = $(this);
@@ -39,35 +39,40 @@ $(function() {
         img.attr('src','http://sendloveio.imgix.net/heart_40_35_gray.gif');
         img.attr('title','like!');
       }
-      if (!obj.data('liked')) { 
-
-      // handle post
-        var data = {};
-        data.thingId = locations._id;
-        data.personId = user._id;
-        data.partType = "like";
-        data.nValue = 1;
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-Token': csrf
-          }
-        });
-        $.ajax({
-          type: 'POST',
-          url: '/api/detail/',
-          data: data,
-          dataType: 'application/json',
-          success: function(data) {
-            console.log('success');
-            console.log(data);
-          }
-        });
+      var nValue;
+      if (!obj.data('liked')) {
+        nValue = 1;
       }
+      else {
+        nValue = -1; 
+      }
+      // handle post
+      var data = {};
+      data.thingId = locations[0]._id;
+      data.personId = user;
+      data.partType = "like";
+      data.nValue = nValue;
+      $.ajaxSetup({
+        headers: {
+          'X-CSRF-Token': csrf
+        }
+      });
+      $.ajax({
+        type: 'POST',
+        url: '/api/detail/',
+        data: data,
+        dataType: 'application/json',
+        success: function(data) {
+          console.log('success');
+          console.log(data);
+        }
+      });
+
     }
     else {
       alert('login to like!');
     }
-    return false; // shorthand for event.preventDefault(); event.stopPropagation(); 
+    return false; // shorthand for event.preventDefault(); event.stopPropagation();
     /*
       TODO "return false" prevents a post action and allows multiple likes
     */
@@ -76,7 +81,7 @@ $(function() {
 
 $(function() {
   $('.reply-button').click(function() {
-  
+
     if (typeof user != "undefined") {
       // ok
     }
@@ -90,30 +95,29 @@ $(function() {
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 11, // 13 is close
-    center: {lat: locations.latitude, lng: locations.longitude},  
+    center: {lat: locations[0].latitude, lng: locations[0].longitude},
     mapTypeId: 'roadmap' // satellite terrain roadmap hybrid
   });
 
- 
-  
+
   heatmap = new google.maps.visualization.HeatmapLayer({
     data: getPoints(),  // uses locals.locations
     map: map
   });
-  
+
   // use locals.locations to drop markers
-  
+
   // TODO: "DetailSets"
 
   var marker = new google.maps.Marker({
-  position: new google.maps.LatLng(locations.latitude, locations.longitude),
+  position: new google.maps.LatLng(locations[0].latitude, locations[0].longitude),
   icon: {
     url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAjCAIAAABpW9/5AAAABnRSTlMAAAAAAABupgeRAAAACXBIWXMAARxbAAEcWwEUN6FaAAACMElEQVRYw8XXS0hVURTG8d89V4uiMEWwib0GlgVqYGJlgyQsKsJJkyCoYeYsgwZBRYMG2aShCRHUrBcR5UAIkuhB5ZN0koNASCsqDEsra2DJTb2Pc1PvNzrsvdb+7732Y60T8a8iVLGXMpaDt3RwjzbGJdEaaiijgIBBurjP62mWkSluZymNM2gfZ+iO01vIcarj9LZyjsGYlujkVyXNFMZfTT61vKN3WtcOmihKGIl9vIxh/wEXc4nFySIZsJ0hXsU07uE8C5L5LmInD/kwGeqF3GCVVPWDw7SDEq6QnbJvP/sZnVjxQXYLoYByrpNFM3lhfHP5QgfRKI0sEU45DFPKLqFVxFWyKiiQjg4RpOWYz2aytkpT+dLXFoL1MqANBCsyAS4kyMsEOJcgOxPgLIJvmQB/JRjIBPgNQXsmwC8IWjIBvkvwjJ75pT6mayJJ9FGb7vsXViPU83kCPMQw2+ae+pMGOmMLgW7GqZhL6ndO0Dq99HnOIFWxTbOn99TTNmPNhV4eUc6yWaU+oG5aoTl1eUPcJJuS2ThuHznNRUYSl7exWstJNqaL/MVtLvApjkEkcW1VyzFyQlIHOMWThDbRxLPu5Q4rWZ0ytYU6+pOZRVO58i0MU5ls18dppJGxFOaX6t3popPq+IX7KA3cSjkwkVCbV0wTuTPl13qehhkqEva4ruMyS2NaxjgSkpqmNtFODz10UzOfqe3AX/DRec7kEZq4NjcPe/JfoNL/cP8N53lwp5gXjtsAAAAASUVORK5CYII=',
     scaledSize: new google.maps.Size(10, 8),
   },
   map: map,
-  title: locations.name,
-  targetUrl: '/api/intention/' + locations._id.toString(),
+  title: locations[0].name,
+  targetUrl: '/api/intention/' + locations[0]._id.toString(),
   animation: google.maps.Animation.DROP,
   draggable: false
   });
@@ -131,19 +135,18 @@ function initMap() {
 
       }
   }
-  
-  
+
 
   // testing recenter
   //   var pos = {
   //     lat: locations[0].latitude,
   //     lng: locations[0].longitude
-  //   };  
+  //   };
   // map.setCenter(pos);
   // map.setZoom(4);
-  
+
   // if there are not very many markers, make them bigger:
-  
+
   if (locations.length < 1000) {
     changeOpacity() ;
     changeGradient() ;
@@ -201,11 +204,8 @@ function getPoints() {
   return mapPoints;
 }
 
-
-
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   if (!browserHasGeolocation) {
     console.log('geolocation error');
   }
 }
-

@@ -14,14 +14,14 @@ block content
 
   .btn-group.btn-group-justified
     a.btn.btn-primary(href='/api/new_intention')
-      i.fa.fa-map-marker 
+      i.fa.fa-map-marker
       | Create your intention
     a.btn.btn-primary(href='http://www.facebook.com/sharer/sharer.php?u='+shareUrl, target='_blank')
       i.fa.fa-share
       | Share your intention
 
   br
-  p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a>  > <a href="/api/feed">Feed</a>  
+  p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a>  > <a href="/api/feed">Feed</a>
   br
   .row
     .col-xs-11
@@ -36,16 +36,19 @@ block content
           .col-xs-10.col-sm-8.col-md-7.col-lg-5
             br
             a(href='/api/intention/' + result._id )
-              img(class='img-thumbnail', src='http://sendloveio.imgix.net/'+result.imagePath + "?h=500&q=60", title=result.name)  
+              img(class='img-thumbnail', src='http://sendloveio.imgix.net/'+result.imagePath + "?h=500&q=60", title=result.name)
           .col-xs-10.col-sm-9.col-md-8.col-lg-5
             h4
               a(href='/api/intention/' + result._id ) #{result.name}
           .col-xs-10.col-sm-9.col-md-8.col-lg-5
             br
-            p #{result.description.substring(0,255)}..
+            p #{result.description}..
           .col-xs-10.col-sm-9.col-md-8.col-lg-5
-            i
-              a(href='/api/feed?category=' + result.category ) #{result.category}
+            i=result.userName
+            br
+            i=result.updatedAt
+            br
+            a(href='/api/map?category=' + result.category) #{result.category}
         .row
           .col-xs-12.col-lg-10
             br
@@ -53,8 +56,8 @@ block content
 
 
   // put jquery before scripts that use it
-  script(src="/js/jquery/jquery.min.js") 
-  
+  script(src="/js/jquery/jquery.min.js")
+
   //- exif.js is an npm module used for image orientation. todo getelementbytagname=img
   //- script(src="/js/exif.js")
   //- script(src="/js/load-image.all.min.js")
@@ -65,8 +68,8 @@ block content
   //- this is the simple way of making a local available to client javascript.
   script(type='text/javascript').
     var locations =!{JSON.stringify(mapLocations)}
-    
+
   script.
     document.write("<script type='text/javascript' var locations=locals.mapLocations src='/js/map.js?" + Date.now() + "'><\/script>");
-  
+
   script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
   Module dependencies.
@@ -28,7 +28,7 @@ const multerS3 = require('multer-s3');
 /*
   Load environment variables from .env file, where API keys and passwords are configured.
 */
-dotenv.load({path: '.env.example'});
+dotenv.load({path: '.env.config'}); // NB: add to .gitignore
 
 /*
   Controllers (route handlers).
@@ -37,6 +37,7 @@ const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
 const contactController = require('./controllers/contact');
+const sendloveController = require('./controllers/sendlove');
 
 /*
   API keys and Passport configuration.
@@ -153,7 +154,7 @@ var uploadS3 = multer({
   Primary app routes.
 */
 app.get('/reply', function (req, res) {
-  res.render('reply', { title: 'SendLove I/O SMS'});
+  res.render('reply', { title: 'SendLove I/O SMS'}); // TODO parameterize title
 });
 app.get('/privacy', function (req, res) {
   res.render('privacy', { title: 'Privacy Policy'});
@@ -162,7 +163,7 @@ app.get('/privacy', function (req, res) {
 // LOGIN routes
 
 // GET
-app.get('/', apiController.getFeed); // homeController.index);
+app.get('/', sendloveController.getFeed); // homeController.index);
 app.get('/account', passportConfig.isAuthenticated, userController.getAccount);
 app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userController.getOauthUnlink);
 app.get('/contact', contactController.getContact);
@@ -192,7 +193,7 @@ app.get('/api/clockwork', apiController.getClockwork);
 app.get('/api/facebook', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 app.get('/api/foursquare', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFoursquare);
 app.get('/api/github', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getGithub);
-app.get('/api/goodnews', apiController.getGoodNews);
+app.get('/api/goodnews', sendloveController.getGoodNews);
 app.get('/api/google-maps', apiController.getGoogleMaps);
 app.get('/api/instagram', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getInstagram);
 app.get('/api/lastfm', apiController.getLastfm);
@@ -210,19 +211,19 @@ app.get('/api/tumblr', passportConfig.isAuthenticated, passportConfig.isAuthoriz
 app.get('/api/twilio', apiController.getTwilio);
 app.get('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getTwitter);
 app.get('/api/upload', apiController.getFileUpload);
-app.get('/api/new_intention', passportConfig.isAuthenticated, apiController.getNewIntention);
-app.get('/api/intention/:token', apiController.getIntention);
-app.get('/api/message', passportConfig.isAuthenticated, apiController.getMessage);
-app.get('/api/map', apiController.getMap);
-app.get('/api/feed', apiController.getFeed);
-app.get('/api/testmap', apiController.getTestMap);
+app.get('/api/new_intention', passportConfig.isAuthenticated, sendloveController.getNewIntention);
+app.get('/api/intention/:token', sendloveController.getIntention);
+app.get('/api/message', passportConfig.isAuthenticated, sendloveController.getMessage);
+app.get('/api/map', sendloveController.getMap);
+app.get('/api/feed', sendloveController.getFeed);
+app.get('/api/testmap', sendloveController.getTestMap);
 
 // POST
-app.post('/api/new_intention', passportConfig.isAuthenticated, uploadS3.array('imgFile'), apiController.postIntention);
-app.post('/api/intention/:token', passportConfig.isAuthenticated, apiController.postDetail);
-app.post('/api/message', passportConfig.isAuthenticated, apiController.postMessage);
-app.post('/api/intention', passportConfig.isAuthenticated, apiController.postDetail);
-app.post('/api/detail', passportConfig.isAuthenticated, apiController.postDetail);
+app.post('/api/new_intention', passportConfig.isAuthenticated, uploadS3.array('imgFile'), sendloveController.postIntention);
+app.post('/api/intention/:token', passportConfig.isAuthenticated, sendloveController.postDetail);
+app.post('/api/message', passportConfig.isAuthenticated, sendloveController.postMessage);
+app.post('/api/intention', passportConfig.isAuthenticated, sendloveController.postDetail);
+app.post('/api/detail', passportConfig.isAuthenticated, sendloveController.postDetail);
 
 /*
 app.post('/api/clockwork', passportConfig.isAuthenticated, apiController.postClockwork);
