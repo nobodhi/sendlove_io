@@ -24,28 +24,28 @@ block content
   // included in map.pug and feed.pug.
   br
   .row
-    .col-xs-12.col-md-8
+    .col-xs-12
       for result in mapLocations.reverse()
         .row
-          .col-xs-12
-            h4
-              a(href='/api/intention/' + result._id ) #{result.name}
-        .row
-          .col-xs-12
+          .col-xs-11.col-sm-10.col-md-5
             br
             a(href='/api/intention/' + result._id )
               img(class='img-thumbnail', src='http://sendloveio.imgix.net/'+result.imagePath + "?h=500&q=60", title=result.name)
-        .row
-          .col-xs-12
+          .col-xs-11.col-sm-10.col-md-5
+            h4
+              a(href='/api/intention/' + result._id ) #{result.name}
+          .col-xs-11.col-sm-10.col-md-5
             br
             blockquote(style='overflow:hidden;white-space:pre-wrap;text-overflow:ellipsis;') #{result.description}..
-        .row
-          .col-xs-12
+          .col-xs-11.col-sm-10.col-md-5
             i=result.userName
             br
             i=result.updatedAt
             br
             a(href='/api/map?category=' + result.category) #{result.category}
+        .row
+          .col-xs-12.col-lg-10
+            br
             hr
 
 

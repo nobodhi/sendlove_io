@@ -35,7 +35,8 @@ block content
       .col-sm-7
         input.form-control(type='text', name='website', id='website', value=user.profile.website)
     .form-group
-      label.col-sm-3.control-label(for='gravatar') Gravatar
+      label.col-sm-3.control-label(for='gravatar')
+        a(href='http://gravatar.com/support/what-is-gravatar/') Gravatar
       .col-sm-7
         if user.profile.picture
             img(src=user.profile.picture)

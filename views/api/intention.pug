@@ -26,7 +26,7 @@ block content
   br
 
   .row
-    .col-xs-12.col-md-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
       h3=title
 
     .col-xs-2
@@ -48,7 +48,7 @@ block content
         //-|&nbsp;like
 
   .row
-    .col-xs-12.col-md-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
       a(href=imagePath)
         img(class='img-thumbnail', title=title, src=imagePath+"?h=500&auto=format,enhance&q=90", id='theImage')
       blockquote(style='overflow:hidden;white-space:pre-wrap;text-overflow:ellipsis;')=description
@@ -59,12 +59,12 @@ block content
       a(href='/api/map?category=' + category) #{category}
 
   .row
-    .col-xs-12.col-md-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
       br
       #map
 
   .row
-    .col-xs-10.col-md-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
       form(role='form', method='POST')
         br
         input(type='hidden', name='_csrf', value=_csrf)
@@ -83,7 +83,7 @@ block content
               | Send
 
   .row
-    .col-xs-10.col-md-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
       h4
         i Replies
       for comment in commentsArray
@@ -96,7 +96,7 @@ block content
               |  #{comment.updatedAt}
 
   .row
-    .col-xs-10.col-md-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
     hr
     //- pre(id='allMetaDataSpan')
 

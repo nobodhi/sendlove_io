@@ -3,6 +3,9 @@ block content
   style.
     #map {
       height: 60vh;
+      margin: 0;
+      padding: 0;
+      // height: 50%;
     }
   .page-header
     h2
@@ -24,17 +27,7 @@ block content
   br
 
   .row
-    .col-xs-12
-      .form-group
-        label.control-label Map it!
-        #map
-        br
-        #floating-panel
-          input(id="address" type="textbox" placeholder="Street address")
-          input(id="submit" type="button" value="map it!")
-
-  .row
-    .col-xs-8
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
       form(role='form', method='POST', enctype='multipart/form-data', onsubmit='modifyInputs();')
         input(type='hidden', name='_csrf', value=_csrf)
         input(type='hidden', id='latitude', name='latitude')
@@ -50,6 +43,15 @@ block content
           .input-group
             label.control-label Image
             input(type='file', name='imgFile', required)
+
+        .form-group
+          label.control-label Map it!
+          #mapcontainer
+            #map
+            #floating-panel
+              #address
+                input(id="address" type="textbox" placeholder="Street address")
+                input(id="submit" type="button" value="map it!" style="display:block;")
 
         .form-group
           .input-group
@@ -83,7 +85,7 @@ block content
   style.
     #floating-panel {
       position: absolute;
-      top: 10px;
+      top: 150px;
       left: 25%;
       z-index: 5;
       background-color: #fff;
