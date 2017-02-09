@@ -64,10 +64,12 @@ block content
         .form-group
           .input-group
             button.btn.btn-default(id='submit', type='submit')
-              i.fa.fa-location-arrow
-              | Send
-            #sidebar(style='display:none;')
-              i(class='fa fa-spinner fa-pulse fa-3x fa-fw')
+              #sendbutton
+                i.fa.fa-location-arrow
+                | Send
+              #sidebar(style='display:none;')
+                i(class='fa fa-spinner fa-pulse fa-3x fa-fw')
+
 
 
   //- in development append a pseudo version number so that the javascript always reloads.
