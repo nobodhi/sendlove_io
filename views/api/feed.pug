@@ -1,11 +1,9 @@
 extends ../layout
-
 block content
   style.
     #map {
       height: 60vh;
     }
-
   .page-header
     h2
       a(href='/api/feed')
@@ -40,7 +38,7 @@ block content
         .row
           .col-xs-12
             br
-            p #{result.description}..
+            blockquote(style='overflow:hidden;white-space:pre-wrap;text-overflow:ellipsis;') #{result.description}..
         .row
           .col-xs-12
             i=result.userName

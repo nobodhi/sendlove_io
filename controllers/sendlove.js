@@ -384,6 +384,7 @@ exports.postTestMap = (req, res) => {
   var mapLocations;
   var imagePath = "http://sendloveio.imgix.net/";
   var shareUrl = "http://" + req.hostname + '/api/map/'
+  var title = 'Sendlove - Map'
 
   if (req.query.category != undefined) {
     getUrl += '/?category=' + req.query.category;
@@ -433,7 +434,7 @@ exports.postTestMap = (req, res) => {
       }
 
       res.render('api/map', {
-        title: 'Map',
+        title,
         shortDescription: 'Set your intention today on SendLove.io.',
         latitude,
         longitude,

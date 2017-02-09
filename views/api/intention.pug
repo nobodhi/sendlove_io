@@ -1,13 +1,9 @@
 extends ../layout
-
 block content
   style.
     #map {
       height: 60vh;
-
     }
-
-
   .page-header
     h2
       a(href='/api/map')
@@ -28,7 +24,6 @@ block content
   - else
     p <a href="/api/intention/#{token}"><b>Intention</b></a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a>
   br
-
 
   .row
     .col-xs-12.col-md-8
@@ -56,7 +51,7 @@ block content
     .col-xs-12.col-md-8
       a(href=imagePath)
         img(class='img-thumbnail', title=title, src=imagePath+"?h=500&auto=format,enhance&q=90", id='theImage')
-      blockquote(style='white-space:pre-wrap;')=description
+      blockquote(style='overflow:hidden;white-space:pre-wrap;text-overflow:ellipsis;')=description
       i=userName
       br
       i=updatedAt
