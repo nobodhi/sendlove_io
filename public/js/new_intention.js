@@ -1,15 +1,13 @@
 var markers = [];
 // latitude and longitude are express locals
 
-function initMap() {
-  
+function initMap () {
+  var geocoder = new google.maps.Geocoder();
   var map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: 36.0907578, lng: -119.5948303 }, // TODO make starting point based on user's location
     zoom: 4
   });
   deleteMarkers();
-  var geocoder = new google.maps.Geocoder();
-
 
   // click submit button
   document.getElementById('submit').addEventListener('click', function() {
@@ -27,22 +25,20 @@ function initMap() {
   });
 
   // Sets the map on all markers in the array.
-  function setMapOnAll(map) {
+  function setMapOnAll (map) {
     for (var i = 0; i < markers.length; i++) {
       markers[i].setMap(map);
     }
   }
   // Removes the markers from the map, but keeps them in the array.
-  function clearMarkers() {
+  function clearMarkers () {
     setMapOnAll(null);
   }
   // Deletes all markers in the array by removing references to them.
-  function deleteMarkers() {
+  function deleteMarkers () {
     clearMarkers();
     markers = [];
   }
-
-
 }
 
 // Sets a marker from a street address.
@@ -83,13 +79,15 @@ function geocodeAddress(geocoder, resultsMap) {
 
 }
 
-// set hidden field inputs
+// set hidden field inputs TODO show the spinner
 function modifyInputs() {
 
   var latitudeInput = document.getElementById("latitude");
   var longitudeInput = document.getElementById("longitude");
+  var sidebar = document.getElementById("sidebar");
   latitudeInput.value = latitude;
   longitudeInput.value = longitude;
+  sidebar.style.display = 'block';
   initMap();
 
 }
