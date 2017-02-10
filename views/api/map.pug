@@ -12,11 +12,14 @@ block content
 
   .btn-group.btn-group-justified
     a.btn.btn-primary(href='/api/new_intention')
-      i.fa.fa-map-marker
-      | Create your intention
-    a.btn.btn-primary(href='http://www.facebook.com/sharer/sharer.php?u='+shareUrl, target='_blank')
       i.fa.fa-share
-      | Share your intention
+      | New!
+    a.btn.btn-primary(href='http://www.facebook.com/sharer/sharer.php?u='+shareUrl, target='_blank')
+      i.fa.fa-facebook
+      | Facebook
+    a.btn.btn-primary(href='https://twitter.com/intent/tweet?text='+shareUrl+'+@sendloveio', target='_blank')
+      i.fa.fa-twitter
+      | Twitter
 
   br
   p <a href="/api/new_intention">Intention</a> > <a href="/api/map"><b>Map</b></a>  > <a href="/api/feed">Feed</a>
