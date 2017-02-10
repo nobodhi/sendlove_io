@@ -211,9 +211,10 @@ app.get('/api/tumblr', passportConfig.isAuthenticated, passportConfig.isAuthoriz
 app.get('/api/twilio', apiController.getTwilio);
 app.get('/api/twitter', passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getTwitter);
 app.get('/api/upload', apiController.getFileUpload);
+
 app.get('/api/new_intention', passportConfig.isAuthenticated, sendloveController.getNewIntention);
 app.get('/api/intention/:token', sendloveController.getIntention);
-app.get('/api/message', passportConfig.isAuthenticated, sendloveController.getMessage);
+// app.get('/api/message', passportConfig.isAuthenticated, sendloveController.getMessage);
 app.get('/api/map', sendloveController.getMap);
 app.get('/api/feed', sendloveController.getFeed);
 app.get('/api/testmap', sendloveController.getTestMap);
@@ -221,7 +222,7 @@ app.get('/api/testmap', sendloveController.getTestMap);
 // POST
 app.post('/api/new_intention', passportConfig.isAuthenticated, uploadS3.array('imgFile'), sendloveController.postIntention);
 app.post('/api/intention/:token', passportConfig.isAuthenticated, sendloveController.postDetail);
-app.post('/api/message', passportConfig.isAuthenticated, sendloveController.postMessage);
+// app.post('/api/message', passportConfig.isAuthenticated, sendloveController.postMessage);
 app.post('/api/intention', passportConfig.isAuthenticated, sendloveController.postDetail);
 app.post('/api/detail', passportConfig.isAuthenticated, sendloveController.postDetail);
 

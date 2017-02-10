@@ -44,7 +44,7 @@ $(function() {
         nValue = 1;
       }
       else {
-        nValue = -1; 
+        nValue = -1;
       }
       // handle post
       var data = {};
@@ -93,6 +93,14 @@ $(function() {
 });
 
 function initMap() {
+
+latitude = locations[0].latitude;
+longitude = locations[0].longitude;
+
+if (latitude === undefined || longitude === undefined) {
+  console.log('no location');
+}
+else {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 11, // 13 is close
     center: {lat: locations[0].latitude, lng: locations[0].longitude},
@@ -152,6 +160,8 @@ function initMap() {
     changeGradient() ;
     changeRadius() ;
   }
+
+}
 
 
 } // initMap

@@ -6,6 +6,7 @@ const async = require('async');
 // const validator = require('validator');
 const request = require('request');
 const cheerio = require('cheerio');
+const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 
 
 /* *****************************************
@@ -112,6 +113,9 @@ exports.postIntention = (req, res, next) => {
   var latitude = req.body.latitude;
   var longitude = req.body.longitude;
 
+  var formData = {};
+
+  var newImage;
 
   // console.log(util.inspect(req, false, null));
 
@@ -120,24 +124,19 @@ exports.postIntention = (req, res, next) => {
   or never upload it in the first place, if it's a bad file.
   */
 
-  if ( isNaN(latitude) || isNaN(longitude) ) {
-    req.flash('errors', { msg: "please include a location :) " });
-    return res.redirect('/api/new_intention');
-  }
-
-  var newImage = req.files[0].key;
+  newImage = req.files[0].key;
   //var mimeTypeClaimed = req.files[0].mimetype.toString();
   var mimeTypeActual = req.files[0].contentType.toString(); // contentType is a metadata set in multerS3
   if (!mimeTypeActual.startsWith("image/")) {
     req.flash('errors', { msg: "Please upload an image of type GIF, JPG, or PNG :) " });
     return res.redirect('/api/new_intention');
   }
-
   var fileSize = req.files[0].size;
   if (fileSize > 10000000) {
     req.flash('errors', { msg: "Please upload an image smaller than 10 megs :) " });
     return res.redirect('/api/new_intention');
   }
+
 
   // TODO delete bad file USING AWS-SDK
 
@@ -147,22 +146,34 @@ exports.postIntention = (req, res, next) => {
     req.flash('errors', errors);
     return res.redirect('/api/new_intention');
   }
-
+  if (isNaN(latitude) || isNaN(longitude)) {
+    req.flash('success', { msg: "consider adding to the map :) " });
+    formData = {
+      name: req.body.name,
+      description: req.body.description,
+      personId: req.user._id,
+      imagePath: newImage,
+      category: req.body.category
+    };
+  }
+  else {
+    formData = {
+      name: req.body.name,
+      description: req.body.description,
+      personId: req.user._id,
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+      imagePath: newImage,
+      category: req.body.category
+    };
+  }
 
   // set API post url, and process form
   const postUrl = process.env.API_URL + '/thing';
-  var formData = {
-    name: req.body.name,
-    description: req.body.description,
-    personId: req.user._id,
-    latitude: Number(latitude),
-    longitude: Number(longitude),
-    imagePath: newImage,
-    category: req.body.category
-  }
+
   var jsonData = JSON.stringify(formData);
-  // console.log(formData);
-  // console.log(postUrl);
+  console.log(formData);
+  console.log(postUrl);
   request({
     url: postUrl,
     method: "POST",

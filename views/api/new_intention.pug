@@ -3,9 +3,6 @@ block content
   style.
     #map {
       height: 60vh;
-      margin: 0;
-      padding: 0;
-      // height: 50%;
     }
   .page-header
     h2
@@ -26,6 +23,8 @@ block content
 
   br
 
+
+
   .row
     .col-xs-11.col-sm-10.col-md-9.col-lg-8
       form(role='form', method='POST', enctype='multipart/form-data', onsubmit='modifyInputs();')
@@ -36,27 +35,28 @@ block content
 
         .form-group
           .input-group
-            label.control-label Name
-            input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name', required)
-
-        .form-group
-          .input-group
-            label.control-label Image
+            label.control-label Image*
             input(type='file', name='imgFile', required)
 
-        .form-group
-          label.control-label Map it!
-          #mapcontainer
-            #map
-            #floating-panel
-              #address
+        .row
+          .col-xs-12
+            .form-group
+              label.control-label Map it!
+              #map
+              br
+              #floating-panel
                 input(id="address" type="textbox" placeholder="Street address")
-                input(id="submit" type="button" value="map it!" style="display:block;")
+                input(id="submit" type="button" value="map it!")
 
         .form-group
           .input-group
-            label.control-label Description
+            label.control-label Description*
             textarea.form-control(name='description', wrap='soft', cols='35', rows='3', placeholder='Give it a great description', required)
+
+        .form-group
+          .input-group
+            label.control-label Name (optional)
+            input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name')
 
         .form-group
           .input-group
@@ -85,11 +85,11 @@ block content
   style.
     #floating-panel {
       position: absolute;
-      top: 150px;
+      top: 10px;
       left: 25%;
       z-index: 5;
       background-color: #fff;
-      padding: 5px;
+      padding: 1px;
       border: 1px solid #999;
       text-align: center;
       font-family: 'Roboto','sans-serif';
