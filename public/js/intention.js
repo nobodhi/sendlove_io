@@ -28,8 +28,12 @@ $(function() {
     if (typeof user != "undefined") {
       // handle ui
       var obj = $(this);
-      var img = obj.find("img");
-      var imgSrcVal = img.attr("src");
+      var img = obj.find('img');
+      var pObj = document.getElementById('counter'); // best way to find something is to put in div
+      // console.log(pObj);
+      pObj.innerHTML = '';
+
+      var imgSrcVal = img.attr('src');
       if (imgSrcVal == 'http://sendloveio.imgix.net/heart_40_35_gray.gif') {
         obj.data('liked', false);
         img.attr('src','http://sendloveio.imgix.net/heart_40_35.gif');
