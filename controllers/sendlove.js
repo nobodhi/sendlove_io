@@ -9,6 +9,185 @@ const cheerio = require('cheerio');
 const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 
 
+
+/* *****************************************
+  GET /api/intention/:id
+  Retrieve a single intention
+***************************************** */
+exports.getIntention = (req, res, next) => {
+  const token = req.params.token;
+  const getUrl = `${process.env.API_URL}/thing/${token}`;
+  var getPartsUrl = process.env.API_URL + '/part';
+  const mapKey = process.env.GOOGLE_MAPS_KEY;
+  var latitude;
+  var longitude;
+  var intention;
+  var title = '';
+  var imagePath = "http://sendloveio.imgix.net/";
+  const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
+  var description;
+  var shortDescription;
+  // set up queryString
+  var queryString = {};
+  var queryStringParts = {}; // TODO slice out personID
+  queryString['thingId'] = token;
+  queryStringParts['thingId'] = token;
+  var personId;
+  var userName;
+  var category;
+  var updatedAt;
+  var mapLocations;
+  var commentsArray;
+  var likesArray;
+  var likesResult; // after removing zeros (liked and unliked)
+  var likesCount = 0;
+
+  // set personId
+  if (req.user !== undefined) {
+    // console.log("logged in, setting async");
+    personId = req.user._id;
+    personId = JSON.stringify(personId);
+    personId = personId.replace(/"/g, ''); // HACK
+    queryString.personId  = personId;
+    // console.log(`personId = ${personId}`);
+  }
+  else {
+    // console.log("not logged in, skipping personId");
+  }
+  // TODO use promises
+  async.parallel({
+    getIntention: (done) => {
+      request.get({url: getUrl, json: true}, (err, request, body) => {
+        if (err) {
+          return (err, body); // this error propagates
+        }
+        if (request.statusCode !== 200) {
+          req.flash('errors', {
+            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+          });
+        }
+        // set any variables
+        let userEmail = request.body[0].person[0].email;
+
+        userName = request.body[0].person[0].profile.name;
+        if (userName === undefined || userName === '') {
+          userEmail = userEmail.split('@')[0];
+          userName = userEmail;
+        }
+        // console.log(userName);
+        imagePath += request.body[0].imagePath;
+        description = request.body[0].description;
+        category = request.body[0].category;
+        updatedAt = request.body[0].updatedAt.toString().substring(0, 10);
+        // console.log(description);
+        try {
+          shortDescription = request.body[0].description.substring(0,145) + "..";
+        }
+        catch (ex) {
+          shortDescription = 'set your intention';
+          console.error('inner', ex.message);
+        }
+        latitude = request.body[0].latitude;
+        longitude = request.body[0].longitude;
+        title += request.body[0].name;
+        done(err, body);
+      });
+    },
+    getLikes: (done) => {
+      queryStringParts.partType = 'like';
+      // console.log(`in getLikes: ${queryStringParts}`);
+      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, request, body) => {
+        if (err) {
+          return next(err);
+        } // todo fix next reference
+        if (request.statusCode !== 200) {
+          req.flash('errors', {
+            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+          });
+        }
+        // set any variables
+        var likesArray = request.body;
+        for (var like of likesArray) {
+          if (!isNaN(like.nValue)) {
+            likesCount += like.nValue; // just count them up
+            if (likesCount < 0) {likesCount = 0};
+          }
+          else {
+            likesArray.splice(like, 1); // remove the element
+          }
+        }
+        // console.log(likesArray);
+        // console.log(`likesCount = ${likesCount}`);
+        done(err, body);
+      });
+    },
+    getComments: (done) => {
+      queryStringParts['partType'] = 'comment';
+      // console.log(`in getComments: ${queryStringParts}`);
+      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, request, body) => {
+        if (err) {
+          return next(err);
+        } // todo fix next reference
+        if (request.statusCode !== 200) {
+          req.flash('errors', {
+            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+          });
+        }
+        // set any variables
+        commentsArray = request.body; // this only works because it's a byref assignment (?!)
+        for (var i = 0; i < commentsArray.length; i++) {
+          // fix updatedAt
+          commentsArray[i].updatedAt = commentsArray[i].updatedAt.toString().substring(0,10)
+          // add userName
+          let userEmail = commentsArray[i].person[0].email;
+          let userName = commentsArray[i].person[0].profile.name;
+
+          if (userName === undefined || userName === '') {
+            userEmail = userEmail.split('@')[0];
+            userName = userEmail;
+          }
+          commentsArray[i].userName = userName;
+          // console.log(commentsArray[i].updatedAt);
+          // console.log(commentsArray[i].userName);
+        }
+
+        done(err, body);
+      });
+    }
+
+
+  },
+  (err, results) => {
+    if (err) {
+      return next(err);
+    }
+
+    // the array that is passed to client side javascript
+    mapLocations = results.getIntention;
+
+    res.render('api/intention', {
+      title,
+      description,
+      shortDescription,
+      latitude,
+      longitude,
+      mapKey,
+      mapLocations: results.getIntention,
+      imagePath,
+      token,
+      shareUrl,
+      likesArray: results.getLikes,
+      commentsArray: results.getComments,
+      userName,
+      category,
+      updatedAt,
+      likesCount,
+      userLikes: 0 // HACK just create the variable here.
+    });
+  });
+};
+
+
 /* *****************************************
   GET /api/new_intention
   for posting a new intention
@@ -25,81 +204,6 @@ exports.getNewIntention = (req, res) => {
     mapKey: process.env.GOOGLE_MAPS_KEY,
     shareUrl
   });
-};
-
-
-/* *****************************************
-  POST /api/detail
-  Create a new detail on api.sendlove.io
-  TODO redirect simply to the page that you came from(?)
-***************************************** */
-exports.postDetail = (req, res, next) => {
-  // console.log(req.body);
-  var thingId = req.body.thingId;
-  var personId = req.body.personId;
-  var partType = req.body.partType;
-  var description = req.body.description;
-  var nValue = req.body.nValue;
-
-  console.log(`posting  ${partType} detail for thingId ${thingId} and  personId ${personId}`);
-  // check errors
-  const errors = req.validationErrors();
-  if (errors) {
-    req.flash('errors', errors);
-    res.redirect('/api/intention/' + thingId);
-    //return res.send();
-  }
-  // set API post url, and process form
-  const postUrl = process.env.API_URL + '/part'
-  if (partType == 'comment') {
-    var formData = {
-      thingId,
-      personId: req.user._id,
-      partType,
-      description
-    }
-  }
-  else { // default to 'like'
-    var formData = {
-      thingId,
-      personId: req.user._id,
-      partType,
-      nValue: parseInt(nValue, 10) // convert to number for API
-    }
-  }
-  var jsonData = JSON.stringify(formData);
-  //console.log(formData);
-  //console.log(jsonData);
-  request({
-    url: postUrl,
-    method: "POST",
-    json: true,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: jsonData
-    }
-    , (err, request, body) => {
-      // `body` is a js object if request was successful
-      if (err) {
-        return next(err);
-      }
-      if (request.statusCode !== 200) {
-        req.flash('errors', {
-          msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
-        });
-        // TODO pass json error msg from api?
-        res.redirect('/api/intention/' + thingId);
-        //return res.send();
-      }
-      if (req.body.partType == 'comment') {
-        res.redirect('/api/intention/' + thingId);
-      }
-      else  {
-        return res.send();
-      }
-    }
-  );
 };
 
 /* *****************************************
@@ -198,187 +302,6 @@ exports.postIntention = (req, res, next) => {
       res.redirect('/api/intention/' + request.body._id);
     }
   );
-};
-
-
-/* *****************************************
-  GET /api/intention/:id
-  Retrieve a single intention
-***************************************** */
-exports.getIntention = (req, res, next) => {
-  const token = req.params.token;
-  const getUrl = `${process.env.API_URL}/thing/${token}`;
-  var getPartsUrl = process.env.API_URL + '/part';
-  const mapKey = process.env.GOOGLE_MAPS_KEY;
-  var latitude;
-  var longitude;
-  var intention;
-  var title = '';
-  var imagePath = "http://sendloveio.imgix.net/";
-  const shareUrl = "http://" + req.hostname + '/api/intention/' + token;
-  var description;
-  var shortDescription;
-  // set up queryString
-  var queryString = {};
-  var queryStringParts = {}; // TODO slice out personID
-  queryString['thingId'] = token;
-  queryStringParts['thingId'] = token;
-  var personId;
-  var userName;
-  var category;
-  var updatedAt;
-  var mapLocations;
-  var commentsArray;
-
-  // set personId
-  if (req.user !== undefined) {
-    // console.log("logged in, setting async");
-    personId = req.user._id;
-    personId = JSON.stringify(personId);
-    personId = personId.replace(/"/g, ''); // HACK
-    queryString.personId  = personId;
-    // console.log(`personId = ${personId}`);
-  }
-  else {
-    // console.log("not logged in, skipping personId");
-  }
-  // TODO use promises
-  async.parallel({
-    getIntention: (done) => {
-      request.get({url: getUrl, json: true}, (err, request, body) => {
-        if (err) {
-          return (err, body); // this error propagates
-        }
-        if (request.statusCode !== 200) {
-          req.flash('errors', {
-            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
-          });
-        }
-        // set any variables
-        let userEmail = request.body[0].person[0].email;
-
-        userName = request.body[0].person[0].profile.name;
-        if (userName === undefined || userName === '') {
-          userEmail = userEmail.split('@')[0];
-          userName = userEmail;
-        }
-        // console.log(userName);
-        imagePath += request.body[0].imagePath;
-        description = request.body[0].description;
-        category = request.body[0].category;
-        updatedAt = request.body[0].updatedAt.toString().substring(0, 10);
-        // console.log(description);
-        try {
-          shortDescription = request.body[0].description.substring(0,145) + "..";
-        }
-        catch (ex) {
-          shortDescription = 'set your intention';
-          console.error('inner', ex.message);
-        }
-        latitude = request.body[0].latitude;
-        longitude = request.body[0].longitude;
-        title += request.body[0].name;
-        done(err, body);
-      });
-    },
-    getLikes: (done) => {
-      queryStringParts.partType = 'like';
-      // console.log(`in getLikes: ${queryStringParts}`);
-      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, request, body) => {
-        if (err) {
-          return next(err);
-        } // todo fix next reference
-        if (request.statusCode !== 200) {
-          req.flash('errors', {
-            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
-          });
-        }
-        // set any variables
-        // console.log(body);
-        done(err, body);
-      });
-    },
-    getComments: (done) => {
-      queryStringParts['partType'] = 'comment';
-      // console.log(`in getComments: ${queryStringParts}`);
-      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, request, body) => {
-        if (err) {
-          return next(err);
-        } // todo fix next reference
-        if (request.statusCode !== 200) {
-          req.flash('errors', {
-            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
-          });
-        }
-        // set any variables
-        commentsArray = request.body;
-        // console.log(commentsArray);
-        for (var i = 0; i < commentsArray.length; i++) {
-          // fix updatedAt
-          commentsArray[i].updatedAt = commentsArray[i].updatedAt.toString().substring(0,10)
-          // add userName
-          let userEmail = commentsArray[i].person[0].email;
-          let userName = commentsArray[i].person[0].profile.name;
-
-          if (userName === undefined || userName === '') {
-            userEmail = userEmail.split('@')[0];
-            userName = userEmail;
-          }
-          commentsArray[i].userName = userName;
-          // console.log(commentsArray[i].updatedAt);
-          // console.log(commentsArray[i].userName);
-        }
-
-        done(err, body);
-      });
-    }
-
-
-  },
-  (err, results) => {
-    if (err) {
-      return next(err);
-    }
-
-    // the array that is passed to client side javascript
-    mapLocations = results.getIntention;
-
-    res.render('api/intention', {
-      title,
-      description,
-      shortDescription,
-      latitude,
-      longitude,
-      mapKey,
-      mapLocations: results.getIntention,
-      imagePath,
-      token,
-      shareUrl,
-      likesArray: results.getLikes,
-      commentsArray: results.getComments,
-      userName,
-      category,
-      updatedAt
-    });
-  });
-};
-
-
-/* *****************************************
-  GET /api/testmap
-  this is the dynamic version
-***************************************** */
-exports.getTestMap = (req, res, next) => {
-  console.log('test page');
-}
-
-
-/* *****************************************
-  POST /api/testmap
-  test posting
-***************************************** */
-exports.postTestMap = (req, res) => {
-  res.redirect('/api/testmap');
 };
 
 
@@ -503,7 +426,7 @@ exports.postTestMap = (req, res) => {
         // delete mapLocations[i]['description'];
         mapLocations[i]['description'] = mapLocations[i]['description'].substring(0,255);
         // fix updatedAt
-        mapLocations[i].updatedAt = mapLocations[i].updatedAt.toString().substring(0,10)
+        mapLocations[i].updatedAt = mapLocations[i].updatedAt.toString().substring(0,10);
         // add userName
         let userEmail = mapLocations[i].person[0].email;
         let userName = mapLocations[i].person[0].profile.name;
@@ -587,6 +510,80 @@ exports.getDetail = (req, res) => {
   });
 }
 
+/* *****************************************
+  POST /api/detail
+  Create a new detail on api.sendlove.io
+  TODO redirect simply to the page that you came from(?)
+***************************************** */
+exports.postDetail = (req, res, next) => {
+  // console.log(req.body);
+  var thingId = req.body.thingId;
+  var personId = req.body.personId;
+  var partType = req.body.partType;
+  var description = req.body.description;
+  var nValue = req.body.nValue;
+
+  console.log(`posting  ${partType} detail for thingId ${thingId} and  personId ${personId}`);
+  // check errors
+  const errors = req.validationErrors();
+  if (errors) {
+    req.flash('errors', errors);
+    res.redirect('/api/intention/' + thingId);
+    //return res.send();
+  }
+  // set API post url, and process form
+  const postUrl = process.env.API_URL + '/part'
+  if (partType == 'comment') {
+    var formData = {
+      thingId,
+      personId: req.user._id,
+      partType,
+      description
+    }
+  }
+  else { // default to 'like'
+    var formData = {
+      thingId,
+      personId: req.user._id,
+      partType,
+      nValue: parseInt(nValue, 10) // convert to number for API
+    }
+  }
+  var jsonData = JSON.stringify(formData);
+  //console.log(formData);
+  //console.log(jsonData);
+  request({
+    url: postUrl,
+    method: "POST",
+    json: true,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: jsonData
+    }
+    , (err, request, body) => {
+      // `body` is a js object if request was successful
+      if (err) {
+        return next(err);
+      }
+      if (request.statusCode !== 200) {
+        req.flash('errors', {
+          msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+        });
+        // TODO pass json error msg from api?
+        res.redirect('/api/intention/' + thingId);
+        //return res.send();
+      }
+      if (req.body.partType == 'comment') {
+        res.redirect('/api/intention/' + thingId);
+      }
+      else  {
+        return res.send();
+      }
+    }
+  );
+};
+
 
 /* *****************************************
   GET /api/goodnews
@@ -641,4 +638,21 @@ exports.getGoodNews = (req, res, next) => {
       });
     }
   );
+};
+
+/* *****************************************
+  GET /api/testmap
+  this is the dynamic version
+***************************************** */
+exports.getTestMap = (req, res, next) => {
+  console.log('test page');
+}
+
+
+/* *****************************************
+  POST /api/testmap
+  test posting
+***************************************** */
+exports.postTestMap = (req, res) => {
+  res.redirect('/api/testmap');
 };

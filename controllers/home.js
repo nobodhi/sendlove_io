@@ -1,31 +1,41 @@
+'use strict';
+
 const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-  service: 'SendGrid',
-  auth: {
-    user: process.env.SENDGRID_USER,
-    pass: process.env.SENDGRID_PASSWORD
-	// token: process.env.SENDGRID_TOKEN
-  }
-});
-/*
+const ses = require('nodemailer-ses-transport');
+
+const transporter = nodemailer.createTransport(ses({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+}));
+// const transporter = nodemailer.createTransport({
+//   service: 'SendGrid',
+//   auth: {
+//     user: process.env.SENDGRID_USER,
+//     pass: process.env.SENDGRID_PASSWORD
+//     // token: process.env.SENDGRID_TOKEN
+//   }
+// });
+
+/* *****************************************
   GET /
   Home page.
-*/
+***************************************** */
 exports.index = (req, res) => {
-  var imagePath = "http://sendloveio.imgix.net/"; 
-  var shareUrl = "http://" + req.hostname + '/'; 
+  var imagePath = "http://sendloveio.imgix.net/";
+  var shareUrl = "http://" + req.hostname + '/';
   res.render('home', {
     title: 'SendLove I/O',
-    shortDescription: 'Set your intention today on SendLove.io.',     
+    shortDescription: 'Set your intention today on SendLove.io.',
     imagePath: imagePath + 'globe.gif',
     shareUrl: shareUrl
   });
 };
 
-/*
+/* *****************************************
   POST /contact
   Send a contact form via Nodemailer.
-*/
+***************************************** */
 exports.postContact = (req, res) => {
   req.assert('name', 'Name cannot be blank').notEmpty();
   req.assert('email', 'Email is not valid').isEmail();

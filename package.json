@@ -12,7 +12,7 @@
   "engines": {
     "node": "6.1.0"
   },
-    "dependencies": {
+  "dependencies": {
     "async": "^2.0.1",
     "aws-sdk": "^2.7.7",
     "bcrypt-nodejs": "^0.0.3",
@@ -46,6 +46,7 @@
     "node-linkedin": "^0.5.4",
     "node-sass-middleware": "^0.9.8",
     "nodemailer": "^2.5.0",
+    "nodemailer-ses-transport": "^1.5.0",
     "passport": "0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-github": "^1.1.0",
@@ -74,9 +75,6 @@
     "eslint-plugin-pug": "^1.0.0",
     "mocha": "^3.0.2",
     "supertest": "^2.0.0"
-  },
-  "engines": {
-    "node": "6.1.0"
   },
   "license": "MIT"
 }

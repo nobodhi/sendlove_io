@@ -1,14 +1,31 @@
+'use strict';
+
 const async = require('async');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const ses = require('nodemailer-ses-transport');
 const passport = require('passport');
 const User = require('../models/User');
 const utils = require('../config/utils');
 
-/*
+const transporter = nodemailer.createTransport(ses({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+}));
+// const transporter = nodemailer.createTransport({
+//   service: 'SendGrid',
+//   auth: {
+//     user: process.env.SENDGRID_USER,
+//     pass: process.env.SENDGRID_PASSWORD
+//     // token: process.env.SENDGRID_TOKEN
+//   }
+// });
+
+/* *****************************************
   GET /login
   Login page.
-*/
+***************************************** */
 exports.getLogin = (req, res) => {
   if (req.user) {
     return res.redirect('/');
@@ -18,10 +35,10 @@ exports.getLogin = (req, res) => {
   });
 };
 
-/*
+/* *****************************************
   POST /login
   Sign in using email and password.
-*/
+***************************************** */
 exports.postLogin = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password cannot be blank').notEmpty();
@@ -66,10 +83,10 @@ exports.postLogin = (req, res, next) => {
   })(req, res, next);
 };
 
-/*
+/* *****************************************
   GET /logout
   Log out.
-*/
+***************************************** */
 exports.logout = (req, res) => {
   // TODO call utils function that deletes the userToken
   if (req.user) {
@@ -81,10 +98,10 @@ exports.logout = (req, res) => {
   res.redirect('/');
 };
 
-/*
+/* *****************************************
   GET /signup
   Signup page.
-*/
+***************************************** */
 exports.getSignup = (req, res) => {
   if (req.user) {
     return res.redirect('/');
@@ -94,10 +111,10 @@ exports.getSignup = (req, res) => {
   });
 };
 
-/*
+/* *****************************************
   POST /signup
   Create a new local account.
-*/
+***************************************** */
 exports.postSignup = (req, res, next) => {
   req.assert('email', 'Email is not valid').isEmail();
   req.assert('password', 'Password must be at least 4 characters long').len(4);
@@ -135,20 +152,20 @@ exports.postSignup = (req, res, next) => {
   });
 };
 
-/*
+/* *****************************************
   GET /account
   Profile page.
-*/
+***************************************** */
 exports.getAccount = (req, res) => {
   res.render('account/profile', {
     title: 'Account Management'
   });
 };
 
-/*
+/* *****************************************
   POST /account/profile
   Update profile information.
-*/
+***************************************** */
 exports.postUpdateProfile = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
   req.sanitize('email').normalizeEmail({remove_dots: false});
@@ -185,10 +202,10 @@ exports.postUpdateProfile = (req, res, next) => {
   });
 };
 
-/*
+/* *****************************************
   POST /account/password
   Update current password.
-*/
+***************************************** */
 exports.postUpdatePassword = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
@@ -215,10 +232,10 @@ exports.postUpdatePassword = (req, res, next) => {
   });
 };
 
-/*
+/* *****************************************
   POST /account/delete
   Delete user account.
-*/
+***************************************** */
 exports.postDeleteAccount = (req, res, next) => {
   User.remove({_id: req.user.id}, (err) => {
     if (err) {
@@ -230,10 +247,10 @@ exports.postDeleteAccount = (req, res, next) => {
   });
 };
 
-/*
+/* *****************************************
   GET /account/unlink/:provider
   Unlink OAuth provider.
-*/
+***************************************** */
 exports.getOauthUnlink = (req, res, next) => {
   const provider = req.params.provider;
 
@@ -253,10 +270,10 @@ exports.getOauthUnlink = (req, res, next) => {
   });
 };
 
-/*
+/* *****************************************
   GET /reset/:token
   Reset Password page.
-*/
+***************************************** */
 exports.getReset = (req, res, next) => {
   if (req.isAuthenticated()) {
     return res.redirect('/');
@@ -280,10 +297,10 @@ exports.getReset = (req, res, next) => {
     });
 };
 
-/*
+/* *****************************************
   POST /reset/:token
   Process the reset password request.
-*/
+***************************************** */
 exports.postReset = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long.').len(4);
   req.assert('confirm', 'Passwords must match.').equals(req.body.password);
@@ -322,19 +339,16 @@ exports.postReset = (req, res, next) => {
         });
     },
     function (user, done) {
-      const transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: process.env.SENDGRID_USER,
-          pass: process.env.SENDGRID_PASSWORD
-        }
-      });
+      let messageText = 'Greetings from SendLove.io!\n\n';
+
+      messageText += `This is a confirmation that the password for your account ${user.email} has been changed.\n\n`;
+      messageText += 'Please let us know if you did not request this change. Thanks!\n\nThe Sendlove.io Team';
+
       const mailOptions = {
         to: user.email,
-        from: 'sendlove.io@sendgrid.net',
+        from: 'joe@sendlove.io',
         subject: 'Your SendLove.io password has been changed',
-        text: `Hello,\n\n
-        This is a confirmation that the password for your account ${user.email} has just been changed.\n`
+        text: messageText
       };
 
       transporter.sendMail(mailOptions, (err) => {
@@ -348,10 +362,10 @@ exports.postReset = (req, res, next) => {
   });
 };
 
-/*
+/* *****************************************
   GET /forgot
   Forgot Password page.
-*/
+***************************************** */
 exports.getForgot = (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/');
@@ -361,13 +375,13 @@ exports.getForgot = (req, res) => {
   });
 };
 
-/*
+/* *****************************************
   POST /forgot
   Create a random token, then the send user an email with a reset link.
-*/
+***************************************** */
 exports.postForgot = (req, res, next) => {
   req.assert('email', 'Please enter a valid email address.').isEmail();
-  req.sanitize('email').normalizeEmail({ remove_dots: false });
+  req.sanitize('email').normalizeEmail({remove_dots: false});
 
   const errors = req.validationErrors();
 
@@ -397,25 +411,24 @@ exports.postForgot = (req, res, next) => {
       });
     },
     function (token, user, done) {
-      const transporter = nodemailer.createTransport({
-        service: 'SendGrid',
-        auth: {
-          user: process.env.SENDGRID_USER,
-          pass: process.env.SENDGRID_PASSWORD
-        }
-      });
+      let messageText = 'Greetings from Sendlove.io! You (or someone else) has requested a password reset.\n\n ';
+
+      messageText += 'Please click on the following link, or paste this into your browser to complete the process:\n\n';
+      messageText += `http://${req.headers.host}/reset/${token}\n\n`;
+      messageText += 'If you did not request this, please ignore this email and your password will remain unchanged.\n';
+
       const mailOptions = {
         to: user.email,
-        from: 'sendlove.io@sendgrid.net',
+        from: 'joe@sendlove.io',
         subject: 'Reset your password on SendLove.io',
-        text: `You are receiving this email because you (or someone else) have requested
-          the reset of the password for your account.\n\n
-          Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset/${token}\n\n
-          If you did not request this, please ignore this email and your password will remain unchanged.\n`
+        text: messageText
       };
 
       transporter.sendMail(mailOptions, (err) => {
+        if (err) {
+          req.flash('errors', {msg: err.message});
+          return res.redirect('/forgot');
+        }
         req.flash('info', {msg: `An e-mail has been sent to ${user.email} with further instructions.`});
         done(err);
       });

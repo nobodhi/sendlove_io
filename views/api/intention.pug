@@ -32,12 +32,20 @@ block content
       h3=title
 
     .col-xs-2
-      br
+      //- figure out if this person has liked this thing
+      if (user != undefined)
+        - for (i in likesArray) {
+            - if (likesArray[i].personId == user._id) {
+              - userLikes += likesArray[i].nValue;
+            - }
+        - }
+      //- p #{userLikes}
+      //- p #{user._id}
       a(class="like-button", href="")
         - if (likesArray != undefined)
-          - if (likesArray[0] != undefined)
+          - if (likesArray[0] != undefined) //- the array exists and is populated
             - if (user != undefined)
-              - if (likesArray[0].personId == user._id && likesArray[0].nValue === 1)
+              - if (userLikes > 0)
                 img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35.gif", height="20" valign="bottom", title="liked!")
               - else
                 img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")
@@ -47,7 +55,7 @@ block content
             img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")
         - else
           img(class="like-image", src="http://sendloveio.imgix.net/heart_40_35_gray.gif", height="20" valign="bottom", title="log in to like!")
-        //-|&nbsp;like
+      p &nbsp;#{likesCount}
 
   .row
     .col-xs-11.col-sm-10.col-md-9.col-lg-8

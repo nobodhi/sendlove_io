@@ -1,12 +1,21 @@
+'use strict';
+
 const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport({
-  service: 'SendGrid',
-  auth: {
-    user: process.env.SENDGRID_USER,
-    pass: process.env.SENDGRID_PASSWORD
-	// token: process.env.SENDGRID_TOKEN
-  }
-});
+const ses = require('nodemailer-ses-transport');
+
+const transporter = nodemailer.createTransport(ses({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+}));
+// const transporter = nodemailer.createTransport({
+//   service: 'SendGrid',
+//   auth: {
+//     user: process.env.SENDGRID_USER,
+//     pass: process.env.SENDGRID_PASSWORD
+//     // token: process.env.SENDGRID_TOKEN
+//   }
+// });
 
 /**
  * GET /contact
@@ -43,7 +52,7 @@ exports.postContact = (req, res) => {
 
   transporter.sendMail(mailOptions, (err) => {
     if (err) {
-      req.flash('errors', { msg: err.message });
+      req.flash('errors', {msg: err.message});
       return res.redirect('/contact');
     }
     req.flash('success', { msg: 'Thanks for being part of SendLove I/O! We will get back to you soon :)' });
