@@ -31,18 +31,24 @@ $(function() {
       var img = obj.find('img');
       var pObj = document.getElementById('counter'); // best way to find something is to put in div
       // console.log(pObj);
-      pObj.innerHTML = '';
+      var pVal = pObj.firstChild.innerHTML;
+      // console.log(pVal);
 
       var imgSrcVal = img.attr('src');
       if (imgSrcVal == 'http://sendloveio.imgix.net/heart_40_35_gray.gif') {
         obj.data('liked', false);
         img.attr('src','http://sendloveio.imgix.net/heart_40_35.gif');
         img.attr('title','liked!');
+        pVal = parseFloat(pVal) + 1;
       } else {
         obj.data('liked', true);
         img.attr('src','http://sendloveio.imgix.net/heart_40_35_gray.gif');
         img.attr('title','like!');
+        pVal = parseFloat(pVal) - 1;
       }
+
+      pObj.firstChild.innerHTML = pVal;
+
       var nValue;
       if (!obj.data('liked')) {
         nValue = 1;
