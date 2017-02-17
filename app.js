@@ -153,11 +153,11 @@ var uploadS3 = multer({
 /*
   Primary app routes.
 */
-app.get('/reply', function (req, res) {
-  res.render('reply', { title: 'SendLove I/O SMS'}); // TODO parameterize title
+app.get('/reply', (req, res) => {
+  res.render('reply', {title: 'SendLove I/O SMS'}); // TODO parameterize title
 });
-app.get('/privacy', function (req, res) {
-  res.render('privacy', { title: 'Privacy Policy'});
+app.get('/privacy', (req, res) => {
+  res.render('privacy', {title: 'Privacy Policy'});
 });
 
 // LOGIN routes

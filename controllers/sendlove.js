@@ -134,7 +134,7 @@ exports.getIntention = (req, res, next) => {
           });
         }
         // set any variables
-        commentsArray = request.body; // this only works because it's a byref assignment (?!)
+        commentsArray = request.body;
         for (var i = 0; i < commentsArray.length; i++) {
           // fix updatedAt
           commentsArray[i].updatedAt = commentsArray[i].updatedAt.toString().substring(0,10)
@@ -176,13 +176,13 @@ exports.getIntention = (req, res, next) => {
       imagePath,
       token,
       shareUrl,
-      likesArray: results.getLikes,
-      commentsArray: results.getComments,
+      likesArray, // : results.getLikes, /* weirdly we can pass either because it's a byref assignment! */
+      commentsArray, // : results.getComments,
       userName,
       category,
       updatedAt,
       likesCount,
-      userLikes: 0 // HACK just create the variable here.
+      userLikes: 0 // HACK just create the variable here, it will be accessed in pug and modified by client JS
     });
   });
 };
@@ -209,7 +209,7 @@ exports.getNewIntention = (req, res) => {
 /* *****************************************
   POST /api/new_intention
   Create a new intention on api.sendlove.io and return it to the user
-  multer has already uploaded the file. we get its file name, determine if it's valid, then delete it if it's not or rename it.
+  multer has already uploaded the file. we get its file name, validate, then delete it if it's not or rename it.
 ***************************************** */
 exports.postIntention = (req, res, next) => {
 
