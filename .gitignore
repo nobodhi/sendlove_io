@@ -31,3 +31,6 @@ bower_components
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# data
+uploads/*

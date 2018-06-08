@@ -9,7 +9,6 @@ const cheerio = require('cheerio');
 const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
 
 
-
 /* *****************************************
   GET /api/intention/:id
   Retrieve a single intention
@@ -50,69 +49,66 @@ exports.getIntention = (req, res, next) => {
     personId = personId.replace(/"/g, ''); // HACK
     queryString.personId  = personId;
     // console.log(`personId = ${personId}`);
-  }
-  else {
+  } else {
     // console.log("not logged in, skipping personId");
   }
   // TODO use promises
   async.parallel({
     getIntention: (done) => {
-      request.get({url: getUrl, json: true}, (err, request, body) => {
+      request.get({url: getUrl, json: true}, (err, req, body) => {
         if (err) {
           return (err, body); // this error propagates
         }
-        if (request.statusCode !== 200) {
+        if (req.statusCode !== 200) {
           req.flash('errors', {
-            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+            msg: `An error occured with status code ${req.statusCode}: ${req.body.message}`
           });
         }
         // set any variables
-        let userEmail = request.body[0].person[0].email;
+        let userEmail = req.body[0].person[0].email;
 
-        userName = request.body[0].person[0].profile.name;
+        userName = req.body[0].person[0].profile.name;
         if (userName === undefined || userName === '') {
           userEmail = userEmail.split('@')[0];
           userName = userEmail;
         }
         // console.log(userName);
-        imagePath += request.body[0].imagePath;
-        description = request.body[0].description;
-        category = request.body[0].category;
-        updatedAt = request.body[0].updatedAt.toString().substring(0, 10);
+        imagePath += req.body[0].imagePath;
+        description = req.body[0].description;
+        category = req.body[0].category;
+        updatedAt = req.body[0].updatedAt.toString().substring(0, 10);
         // console.log(description);
         try {
-          shortDescription = request.body[0].description.substring(0,145) + "..";
-        }
-        catch (ex) {
+          shortDescription = req.body[0].description.substring(0,145) + "..";
+        } catch (ex) {
           shortDescription = 'set your intention';
           console.error('inner', ex.message);
         }
-        latitude = request.body[0].latitude;
-        longitude = request.body[0].longitude;
-        title += request.body[0].name;
+        latitude = req.body[0].latitude;
+        longitude = req.body[0].longitude;
+        title += req.body[0].name;
         done(err, body);
       });
     },
     getLikes: (done) => {
       queryStringParts.partType = 'like';
       // console.log(`in getLikes: ${queryStringParts}`);
-      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, request, body) => {
+      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, req, body) => {
         if (err) {
           return next(err);
         } // todo fix next reference
-        if (request.statusCode !== 200) {
+        if (req.statusCode !== 200) {
           req.flash('errors', {
-            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+            msg: `An error occured with status code ${req.statusCode}: ${req.body.message}`
           });
         }
         // set any variables
-        var likesArray = request.body;
+        var likesArray = req.body;
         for (var like of likesArray) {
           if (!isNaN(like.nValue)) {
             likesCount += like.nValue; // just count them up
             if (likesCount < 0) {likesCount = 0};
-          }
-          else {
+          } else {
             likesArray.splice(like, 1); // remove the element
           }
         }
@@ -124,17 +120,17 @@ exports.getIntention = (req, res, next) => {
     getComments: (done) => {
       queryStringParts['partType'] = 'comment';
       // console.log(`in getComments: ${queryStringParts}`);
-      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, request, body) => {
+      request.get({url: getPartsUrl, qs: queryStringParts, json: true}, (err, req, body) => {
         if (err) {
           return next(err);
         } // todo fix next reference
-        if (request.statusCode !== 200) {
+        if (req.statusCode !== 200) {
           req.flash('errors', {
-            msg: `An error occured with status code ${request.statusCode}: ${request.body.message}`
+            msg: `An error occured with status code ${req.statusCode}: ${req.body.message}`
           });
         }
         // set any variables
-        commentsArray = request.body;
+        commentsArray = req.body;
         for (var i = 0; i < commentsArray.length; i++) {
           // fix updatedAt
           commentsArray[i].updatedAt = commentsArray[i].updatedAt.toString().substring(0,10)
@@ -259,8 +255,7 @@ exports.postIntention = (req, res, next) => {
       imagePath: newImage,
       category: req.body.category
     };
-  }
-  else {
+  } else {
     formData = {
       name: req.body.name,
       description: req.body.description,
@@ -362,8 +357,7 @@ exports.postIntention = (req, res, next) => {
 
       if (mapLocations.length > 0) {
         imagePath += mapLocations[mapLocations.length-1].imagePath;
-      }
-      else {
+      } else {
         imagePath += 'globe.gif';
       }
 
@@ -440,8 +434,7 @@ exports.postIntention = (req, res, next) => {
 
       if (mapLocations.length > 0) {
         imagePath += mapLocations[mapLocations.length - 1].imagePath; // first imagePath, used for sharing
-      }
-      else {
+      } else {
         imagePath += 'globe.gif';
       }
       // console.log(mapLocations);
@@ -540,8 +533,7 @@ exports.postDetail = (req, res, next) => {
       partType,
       description
     }
-  }
-  else { // default to 'like'
+  } else { // default to 'like'
     var formData = {
       thingId,
       personId: req.user._id,
@@ -550,8 +542,8 @@ exports.postDetail = (req, res, next) => {
     }
   }
   var jsonData = JSON.stringify(formData);
-  //console.log(formData);
-  //console.log(jsonData);
+  // console.log(formData);
+  // console.log(jsonData);
   request({
     url: postUrl,
     method: "POST",
@@ -576,8 +568,7 @@ exports.postDetail = (req, res, next) => {
       }
       if (req.body.partType == 'comment') {
         res.redirect('/api/intention/' + thingId);
-      }
-      else  {
+      } else {
         return res.send();
       }
     }
