@@ -119,10 +119,9 @@ app.use(function (req, res, next) {
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
 
 /*
- 2016.11.27
  set up multer and S3. TODO validate size and type of file.
 */
-var s3 = new aws.S3({ /* ... */ }); // is this a var or a const?
+var s3 = new aws.S3({ /* ... */ });
 var uploadS3 = multer({
   storage: multerS3({
     s3: s3,

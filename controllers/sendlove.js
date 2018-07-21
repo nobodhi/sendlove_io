@@ -388,8 +388,8 @@ exports.postIntention = (req, res, next) => {
   var feedKey;
   var mapLocations;
   var imagePath = "http://sendloveio.imgix.net/";
-  var shareUrl = "http://" + req.hostname + '/api/feed/'
-  var title = "Sendlove - Health & Wellbeing Meditations"
+  var shareUrl = "http://" + req.hostname + '/api/feed/';
+  var title = "Sendlove - Health & Wellbeing Meditations";
 
   if (req.query.category != undefined) {
     getUrl += '/?category=' + req.query.category;
