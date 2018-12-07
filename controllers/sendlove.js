@@ -66,6 +66,7 @@ exports.getIntention = (req, res, next) => {
         }
         // set any variables
         let userEmail = req.body[0].person[0].email;
+        delete  req.body[0].person[0].email;
 
         userName = req.body[0].person[0].profile.name;
         if (userName === undefined || userName === '') {
@@ -137,6 +138,8 @@ exports.getIntention = (req, res, next) => {
           // add userName
           let userEmail = commentsArray[i].person[0].email;
           let userName = commentsArray[i].person[0].profile.name;
+          delete commentsArray[i].person[0].email;
+
 
           if (userName === undefined || userName === '') {
             userEmail = userEmail.split('@')[0];
@@ -347,6 +350,7 @@ exports.postIntention = (req, res, next) => {
         // add userName
         let userEmail = mapLocations[i].person[0].email;
         let userName = mapLocations[i].person[0].profile.name;
+        delete mapLocations[i].person[0].email;
 
         if (userName === undefined || userName === '') {
           userEmail = userEmail.split('@')[0];
@@ -367,9 +371,10 @@ exports.postIntention = (req, res, next) => {
         latitude,
         longitude,
         mapKey: process.env.GOOGLE_MAPS_KEY,
-        mapLocations: mapLocations,
-        imagePath: imagePath, // + 'globe.gif',
-        shareUrl: shareUrl
+        mapLocations,
+        // TODO add a new "locatoins" object that just has attributes specifically used in the jquery
+        imagePath, // + 'globe.gif',
+        shareUrl
       });
     }
   );
@@ -416,7 +421,7 @@ exports.postIntention = (req, res, next) => {
         });
       }
       mapLocations = request.body; // NB: this is how to query the sendlove.io api
-      for(var i = 0; i < mapLocations.length; i++) {
+      for (var i = 0; i < mapLocations.length; i++) {
         // delete mapLocations[i]['description'];
         mapLocations[i]['description'] = mapLocations[i]['description'].substring(0,255);
         // fix updatedAt
@@ -424,7 +429,8 @@ exports.postIntention = (req, res, next) => {
         // add userName
         let userEmail = mapLocations[i].person[0].email;
         let userName = mapLocations[i].person[0].profile.name;
-
+        delete mapLocations[i].person[0].email;
+        
         if (userName === undefined || userName === '') {
           userEmail = userEmail.split('@')[0];
           userName = userEmail;
