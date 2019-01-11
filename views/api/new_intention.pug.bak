@@ -1,0 +1,98 @@
+extends ../layout
+block content
+  style.
+    #map {
+      height: 60vh;
+      margin: 0;
+      padding: 0;
+      // height: 50%;
+    }
+  .page-header
+    h2
+      a(href='/api/map')
+        i.fa.fa-map-marker
+      | create a new intention - SendLove.io
+
+  .btn-group.btn-group-justified
+    a.btn.btn-primary(href='/api/new_intention')
+      i.fa.fa-map-marker
+      | Create your intention
+    a.btn.btn-primary(href='http://www.facebook.com/sharer/sharer.php?u='+shareUrl, target='_blank')
+      i.fa.fa-share
+      | Share your intention
+
+  br
+  p <a href="/api/new_intention"><b>Intention</b></a> > <a href="/api/map">Map</a> > <a href="/api/feed">Feed</a>
+
+  br
+
+  .row
+    .col-xs-11.col-sm-10.col-md-9.col-lg-8
+      form(role='form', method='POST', enctype='multipart/form-data', onsubmit='modifyInputs();')
+        input(type='hidden', name='_csrf', value=_csrf)
+        input(type='hidden', id='latitude', name='latitude')
+        input(type='hidden', id='longitude', name='longitude')
+        input(type='hidden', id='imagePath', name='imagePath')
+
+        .form-group
+          .input-group
+            label.control-label Image
+            input(type='file', name='imgFile', required)
+
+        .form-group
+          label.control-label Map it!
+          #mapcontainer
+            #map
+            #floating-panel
+              #address
+                input(id="address" type="textbox" placeholder="Street address")
+                input(id="submit" type="button" value="map it!" style="display:block;")
+
+        .form-group
+          .input-group
+            label.control-label Description*
+            textarea.form-control(name='description', wrap='soft', cols='35', rows='3', placeholder='Give it a great description', required)
+        .form-group
+          .input-group
+            label.control-label Name
+            input.form-control(name='name', type='text', size='20', placeholder='Give it a cool name')
+
+
+        .form-group
+          .input-group
+            label.control-label Category (optional)
+            input.form-control(name='category', type='text', size='20', placeholder='Add a category')
+
+        .form-group
+          .input-group
+            button.btn.btn-default(id='submit', type='submit')
+              #sendbutton
+                i.fa.fa-location-arrow
+                | Send
+              #sidebar(style='display:none;')
+                i(class='fa fa-spinner fa-pulse fa-3x fa-fw')
+
+
+
+  //- in development append a pseudo version number so that the javascript always reloads.
+  //- otherwise do this:
+  //- script(scr='/js/intention.js')
+  script.
+    document.write("<script type='text/javascript' src='/js/new_intention.js?" + Date.now() + "'><\/script>");
+
+  script( async defer src='https://maps.googleapis.com/maps/api/js?key=' + locals.mapKey + '&libraries=visualization&callback=initMap')
+
+  style.
+    #floating-panel {
+      position: absolute;
+      top: 150px;
+      left: 25%;
+      z-index: 5;
+      background-color: #fff;
+      padding: 5px;
+      border: 1px solid #999;
+      text-align: center;
+      font-family: 'Roboto','sans-serif';
+      line-height: 30px;
+      padding-left: 10px;
+    }

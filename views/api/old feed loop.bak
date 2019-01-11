@@ -1,0 +1,22 @@
+// included in map.pug and feed.pug.
+br
+.row
+  .col-xs-11.col-sm-10.col-md-9.col-lg-8
+    for result in mapLocations.reverse()
+      .row
+        h4
+          a(href='/api/intention/' + result._id ) #{result.name}
+      .row
+        br
+        a(href='/api/intention/' + result._id )
+          img(class='img-thumbnail', src='http://sendloveio.imgix.net/'+result.imagePath + "?h=500&q=60", title=result.name)
+      .row
+        br
+        blockquote(style='overflow:hidden;white-space:pre-wrap;text-overflow:ellipsis;') #{result.description}..
+      .row
+        i=result.userName
+        br
+        i=result.updatedAt
+        br
+        a(href='/api/map?category=' + result.category) #{result.category}
+        hr

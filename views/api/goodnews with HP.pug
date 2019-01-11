@@ -1,0 +1,50 @@
+extends ../layout
+
+block content
+  .page-header
+    h2
+      i.fa.fa-newspaper-o
+      | Good News
+    p.lead  Just some positive news that we found around the internets.
+
+  h3 <a href=https://www.reddit.com/r/UpliftingNews/>Reddit</a>
+  table.table.table-condensed
+    thead
+      tr
+        th №
+        th Title
+    tbody
+      each link, index in links
+        tr
+          td= index + 1
+          td!= link
+          if (index > 20)
+            - break;
+   
+  h3 <a href=http://www.goodnewsnetwork.org>Good News Network</a>
+  table.table.table-condensed
+    thead
+      tr
+        th №
+        th Title
+    tbody
+      each link, index in links_gn
+        tr
+          td= index + 1
+          td!= link
+          if (index > 20)
+            - break;
+   
+  h3 <a href=http://www.huffingtonpost.com/section/good-news>Huffington Post</a>
+  table.table.table-condensed
+    thead
+      tr
+        th №
+        th Title
+    tbody
+      each link, index in links_hp
+        tr
+          td= index + 1
+          td!= link
+          if (index > 20)
+            - break;   
